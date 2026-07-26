@@ -5,11 +5,11 @@ import { links, site } from "../data/site";
 import { ExternalLink } from "./ExternalLink";
 
 const navigation = [
-  { label: "Work", to: "/#work" },
-  { label: "Open Source", to: "/open-source" },
-  { label: "About", to: "/#about" },
-  { label: "Résumé", to: "/resume" },
-  { label: "Contact", to: "/#contact" },
+  { id: "work", label: "Work", to: "/#work" },
+  { id: "skills", label: "Skills", to: "/#skills" },
+  { id: "open-source", label: "Open Source", to: "/#open-source" },
+  { id: "about", label: "About", to: "/#about" },
+  { id: "contact", label: "Contact", to: "/#contact" },
 ];
 
 function ThemeToggle() {
@@ -21,6 +21,9 @@ function ThemeToggle() {
     const next = theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
     document.documentElement.style.colorScheme = next;
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute("content", next === "dark" ? "#0B0D0C" : "#F2EFE6");
     localStorage.setItem("gc-theme", next);
     setTheme(next);
   };
@@ -45,20 +48,26 @@ function ThemeToggle() {
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState(
+    () => window.location.hash.slice(1) || "hero",
+  );
   const menuButtonRef = useRef(null);
   const sheetRef = useRef(null);
   const location = useLocation();
   const isActive = (item) => {
-    if (item.to === "/#work") {
+    if (item.id === "work") {
       return (
         location.pathname.startsWith("/work/") ||
-        (location.pathname === "/" && location.hash === "#work")
+        (location.pathname === "/" && activeSection === item.id)
       );
     }
-    if (item.to.startsWith("/#")) {
-      return location.pathname === "/" && location.hash === item.to.slice(1);
+    if (item.id === "open-source") {
+      return (
+        location.pathname === "/open-source" ||
+        (location.pathname === "/" && activeSection === item.id)
+      );
     }
-    return location.pathname === item.to;
+    return location.pathname === "/" && activeSection === item.id;
   };
 
   useEffect(() => {
@@ -67,6 +76,39 @@ export function Header() {
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, []);
+
+  useEffect(() => {
+    if (location.pathname !== "/") return undefined;
+    const sectionIds = [
+      "hero",
+      "work",
+      "skills",
+      "open-source",
+      "principles",
+      "about",
+      "contact",
+    ];
+    let frame = 0;
+    const update = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        const marker = window.scrollY + 180;
+        let current = "hero";
+        sectionIds.forEach((id) => {
+          const element = document.getElementById(id);
+          if (element && element.offsetTop <= marker) current = id;
+        });
+        setActiveSection(current);
+        frame = 0;
+      });
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", update);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [location.pathname]);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -128,6 +170,9 @@ export function Header() {
         </nav>
 
         <div className="header-actions">
+          <Link className="header-resume-link" to={links.resume}>
+            View résumé
+          </Link>
           <ExternalLink
             className="icon-link"
             href={links.github}
@@ -191,6 +236,10 @@ export function Header() {
                   {item.label}
                 </Link>
               ))}
+              <Link to={links.resume}>
+                <span>06</span>
+                View résumé
+              </Link>
             </nav>
             <div className="mobile-sheet-meta">
               <p>{site.availability}</p>

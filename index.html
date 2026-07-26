@@ -7,7 +7,8 @@
       name="description"
       content="Govind Charpe builds software products and contributes reviewed changes to open-source engineering systems."
     />
-    <meta name="theme-color" content="#0B0D10" />
+    <meta name="theme-color" content="#0B0D0C" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script>
       (() => {
         const saved = localStorage.getItem("gc-theme");
@@ -18,11 +19,44 @@
             : "dark");
         document.documentElement.dataset.theme = theme;
         document.documentElement.style.colorScheme = theme;
+        document
+          .querySelector('meta[name="theme-color"]')
+          ?.setAttribute("content", theme === "dark" ? "#0B0D0C" : "#F2EFE6");
       })();
     </script>
+    <style>
+      .noscript-summary {
+        max-width: 760px;
+        padding: 10vh 24px;
+        margin: auto;
+        font-family: system-ui, sans-serif;
+      }
+      .noscript-summary a {
+        color: inherit;
+      }
+    </style>
     <title>Govind Charpe — Software Engineer</title>
   </head>
   <body>
+    <noscript>
+      <main class="noscript-summary">
+        <h1>Govind Charpe — Software engineering student</h1>
+        <p>
+          I build backend, full-stack, and cloud-native systems. GitAnalyzer is
+          my strongest live product, and my reviewed open-source work includes
+          CNCF Harbor CLI and Sugar Labs Music Blocks.
+        </p>
+        <p>
+          Core tools include JavaScript, TypeScript, React, Go, REST APIs,
+          PostgreSQL, Git, GitHub, and Docker.
+        </p>
+        <p>
+          <a href="/resume.pdf">View résumé PDF</a> ·
+          <a href="mailto:govind.charpe16@gmail.com">Contact me</a> ·
+          <a href="https://github.com/gcharpe1604">GitHub</a>
+        </p>
+      </main>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

@@ -1,88 +1,48 @@
 import { ArrowDown, ArrowRight, Github } from "lucide-react";
-import { useState } from "react";
+import { domMax, LazyMotion } from "motion/react";
 import { Link } from "react-router-dom";
 import { ContactSection } from "../components/ContactSection";
-import { ContributionRecord } from "../components/ContributionRecord";
+import { ContributionLedger } from "../components/ContributionLedger";
+import { EngineeringPrinciples } from "../components/EngineeringPrinciples";
 import { ExternalLink } from "../components/ExternalLink";
-import { GitAnalyzerShowcase } from "../components/GitAnalyzerShowcase";
-import { LeadFlowDiagram } from "../components/LeadFlowDiagram";
-import { MediaDialog } from "../components/MediaDialog";
-import { ResponsiveImage } from "../components/ResponsiveImage";
+import { FeatureExplorer } from "../components/FeatureExplorer";
+import { PipelineExplorer } from "../components/PipelineExplorer";
+import { ProofLens } from "../components/ProofDesk";
 import { SectionHeading } from "../components/SectionHeading";
-import {
-  about,
-  capabilities,
-  contributions,
-  leadFlowStages,
-  links,
-  openSourceIntro,
-  organizations,
-  projects,
-  site,
-  stats,
-} from "../data/site";
-import { assets } from "../data/assets";
+import { SkillEvidenceMatrix } from "../components/SkillEvidenceMatrix";
+import { aboutRail } from "../data/home";
+import { about, links, site, stats } from "../data/site";
 
 function Hero() {
   return (
-    <section className="hero grid-surface" aria-labelledby="hero-title">
-      <div className="hero-grid">
-        <div className="hero-copy">
+    <section
+      className="editorial-hero engineering-grid"
+      id="hero"
+      aria-labelledby="hero-title"
+    >
+      <div className="editorial-hero-grid">
+        <div className="editorial-hero-copy">
           <span className="eyebrow">{site.eyebrow}</span>
           <h1 id="hero-title">{site.headline}</h1>
           <p>{site.introduction}</p>
           <div className="hero-actions">
             <a className="button button-primary" href="#work">
-              Explore my work <ArrowDown aria-hidden="true" />
+              Explore selected work <ArrowDown aria-hidden="true" />
             </a>
-            <ExternalLink
-              className="button button-secondary"
-              href={links.github}
-            >
-              <Github aria-hidden="true" />
-              View GitHub
-            </ExternalLink>
+            <Link className="button button-secondary" to={links.resume}>
+              View résumé <ArrowRight aria-hidden="true" />
+            </Link>
           </div>
-          <Link className="resume-link" to={links.resume}>
-            Download résumé <ArrowRight aria-hidden="true" />
-          </Link>
+          <ExternalLink className="hero-github-link" href={links.github}>
+            <Github aria-hidden="true" />
+            GitHub profile
+          </ExternalLink>
           <p className="availability">
             <span aria-hidden="true" />
             {site.availability}
           </p>
         </div>
-
-        <div className="proof-stack" aria-label="Engineering proof">
-          <a className="proof-card proof-product" href="#work">
-            <div className="proof-media">
-              <ResponsiveImage
-                asset={assets.gitAnalyzerDashboard}
-                loading="eager"
-                fetchPriority="high"
-                sizes="(max-width: 767px) 90vw, 480px"
-              />
-            </div>
-            <span>GitAnalyzer · Product interface</span>
-          </a>
-          <a className="proof-card proof-terminal" href="#open-source">
-            <div className="proof-media">
-              <ResponsiveImage
-                asset={assets.harborTerminal}
-                sizes="(max-width: 767px) 44vw, 400px"
-              />
-            </div>
-            <span>Harbor CLI · PR #1030 · In review</span>
-          </a>
-          <a className="proof-card proof-review" href="#open-source">
-            <div className="proof-media">
-              <ResponsiveImage
-                asset={assets.harborReview}
-                sizes="(max-width: 767px) 44vw, 360px"
-              />
-            </div>
-            <span>Approved by a Harbor CLI maintainer · Awaiting merge</span>
-          </a>
-        </div>
+        <ProofLens />
       </div>
 
       <dl className="proof-stats" aria-label="Portfolio proof statistics">
@@ -101,197 +61,44 @@ function Hero() {
   );
 }
 
-function LeadFlowShowcase() {
-  const project = projects.leadFlow;
-  return (
-    <article className="leadflow-showcase">
-      <div className="leadflow-visual grid-surface">
-        <LeadFlowDiagram stages={leadFlowStages} />
-        <figure className="qualification-inset">
-          <ResponsiveImage
-            asset={assets.leadFlowQualification}
-            sizes="(max-width: 767px) 82vw, 340px"
-          />
-          <figcaption>
-            <span>Sample structured qualification output</span>
-            <MediaDialog
-              asset={assets.leadFlowQualification}
-              label="Expand output"
-              caption="Sample structured qualification output"
-            />
-          </figcaption>
-        </figure>
-      </div>
-      <div className="leadflow-story">
-        <div>
-          <span className="eyebrow">{project.label}</span>
-          <h3>{project.title}</h3>
-          <p>{project.description}</p>
-          <div className="action-row">
-            <Link
-              className="button button-primary"
-              to={project.links.caseStudy}
-            >
-              Explore the system <ArrowRight aria-hidden="true" />
-            </Link>
-            <ExternalLink className="text-link" href={project.links.source}>
-              Source code
-            </ExternalLink>
-          </div>
-        </div>
-        <div className="project-engineering">
-          <p>{project.summary}</p>
-          <ul>
-            {project.highlights.slice(0, 4).map((highlight) => (
-              <li key={highlight}>{highlight}</li>
-            ))}
-          </ul>
-          <p className="stack-line">{project.stack.join(" · ")}</p>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function HomeOpenSource() {
-  const [organization, setOrganization] = useState("harbor");
-  const organizationIds = Object.keys(organizations);
-  const featuredNumbers =
-    organization === "harbor" ? [1030, 849, 930] : [6316, 6602];
-  const visible = contributions.filter(
-    (item) =>
-      item.organization === organization &&
-      featuredNumbers.includes(item.number),
-  );
-
-  return (
-    <section className="open-source-section" id="open-source">
-      <div className="open-source-grid">
-        <div className="open-source-intro">
-          <span className="section-number">02</span>
-          <h2>{openSourceIntro.heading}</h2>
-          <p>{openSourceIntro.copy}</p>
-          <div className="organization-switch" role="tablist">
-            {Object.values(organizations).map((org) => (
-              <button
-                key={org.id}
-                id={`organization-tab-${org.id}`}
-                type="button"
-                role="tab"
-                aria-selected={organization === org.id}
-                aria-controls="organization-panel"
-                onClick={() => setOrganization(org.id)}
-                onKeyDown={(event) => {
-                  if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
-                  event.preventDefault();
-                  const direction = event.key === "ArrowRight" ? 1 : -1;
-                  const currentIndex = organizationIds.indexOf(org.id);
-                  const nextId =
-                    organizationIds[
-                      (currentIndex + direction + organizationIds.length) %
-                        organizationIds.length
-                    ];
-                  setOrganization(nextId);
-                  document
-                    .getElementById(`organization-tab-${nextId}`)
-                    ?.focus();
-                }}
-              >
-                {org.name}
-              </button>
-            ))}
-          </div>
-          <p className="organization-description">
-            {organizations[organization].intro}
-          </p>
-          <Link className="text-link" to={`/open-source?org=${organization}`}>
-            View all contributions <ArrowRight aria-hidden="true" />
-          </Link>
-        </div>
-        <div
-          className="contribution-stack"
-          id="organization-panel"
-          role="tabpanel"
-          aria-labelledby={`organization-tab-${organization}`}
-          aria-live="polite"
-        >
-          {visible.map((contribution) => (
-            <ContributionRecord
-              key={`${contribution.organization}-${contribution.number}`}
-              contribution={contribution}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Capabilities() {
-  return (
-    <section className="capabilities-section">
-      <SectionHeading
-        number="03"
-        title="Capabilities backed by work"
-        copy="Technologies I have used to build products or contribute to existing systems—not a list of everything I have briefly explored."
-      />
-      <div className="capability-bands">
-        {capabilities.map((capability, index) => (
-          <article key={capability.title} className="capability-band">
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <h3>{capability.title}</h3>
-            <div>
-              <p>{capability.description}</p>
-              <ul className="tag-list">
-                {capability.technologies.map((technology) => (
-                  <li key={technology}>{technology}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="evidence-links">
-              {capability.evidence.map((evidence) => (
-                <Link key={evidence.label} to={evidence.href}>
-                  {evidence.label}
-                </Link>
-              ))}
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function About() {
   return (
-    <section className="about-section" id="about">
-      <SectionHeading number="04" title="About me" />
-      <div className="about-grid">
-        <div className="about-copy">
-          {about.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
+    <section
+      className="home-section about-section editorial-section"
+      id="about"
+    >
+      <SectionHeading
+        number="05"
+        title="About"
+        copy="A product builder learning to make sound engineering decisions inside systems that other people rely on."
+      />
+      <div className="about-editorial-grid">
+        <div className="about-editorial-copy">
+          <p>{about.paragraphs[0]}</p>
+          <p>{about.paragraphs[1]}</p>
           <blockquote>
             Building products taught me ownership. Working in existing systems
             taught me judgment.
           </blockquote>
+          <p>{about.paragraphs[2]}</p>
         </div>
-        <aside className="about-rail">
+
+        <aside className="about-status-rail" aria-label="Current direction">
+          <dl>
+            {aboutRail.map((item) => (
+              <div key={item.label}>
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
+              </div>
+            ))}
+          </dl>
           <section>
-            <span className="eyebrow">Current focus</span>
-            <ul>
-              {about.focus.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </section>
-          <section>
-            <span className="eyebrow">Education</span>
+            <span className="project-kicker">Education</span>
             {about.education.map((line) => (
               <p key={line}>{line}</p>
             ))}
           </section>
-          <section className="current-build">
+          <section className="about-open-track">
             <span className="status-badge status-development">
               <span className="status-dot" aria-hidden="true" />
               Under development
@@ -304,23 +111,87 @@ function About() {
   );
 }
 
+function ChapterCut({ number, label, statement, tone = "dark" }) {
+  return (
+    <div
+      className={`chapter-cut chapter-cut-${tone}`}
+      aria-label={`${label} chapter`}
+    >
+      <div>
+        <span>{number}</span>
+        <strong>{label}</strong>
+      </div>
+      <p>{statement}</p>
+      <span className="chapter-trace" aria-hidden="true">
+        <i />
+      </span>
+    </div>
+  );
+}
+
 export default function HomePage() {
   return (
-    <>
+    <LazyMotion features={domMax} strict>
       <Hero />
-      <section className="selected-work-section" id="work">
+
+      <ChapterCut
+        number="01"
+        label="Build"
+        statement="Products should explain themselves—and prove their decisions."
+      />
+
+      <section className="home-section selected-work-section" id="work">
         <SectionHeading
           number="01"
           title="Selected work"
-          copy="Products and engineering systems I have taken from an initial problem to a working implementation."
+          copy="Two different engineering systems: one product for understanding repository history, one workflow for making automated decisions inspectable."
         />
-        <GitAnalyzerShowcase />
-        <LeadFlowShowcase />
+        <FeatureExplorer />
+        <PipelineExplorer />
       </section>
-      <HomeOpenSource />
-      <Capabilities />
+
+      <section className="home-section skills-section" id="skills">
+        <SectionHeading
+          number="02"
+          title="Skills, with evidence"
+          copy="A scannable inventory of tools I have actually used, with context that distinguishes shipped work from growing proficiency."
+        />
+        <SkillEvidenceMatrix />
+      </section>
+
+      <ChapterCut
+        number="02"
+        label="Contribute"
+        statement="The strongest claims survive contact with an existing system."
+        tone="paper"
+      />
+
+      <section className="home-section open-source-section" id="open-source">
+        <SectionHeading
+          number="03"
+          title="Open-source validation"
+          copy="Representative changes from Harbor CLI and Music Blocks. Status, implementation evidence, and review context stay tied to the underlying pull requests."
+        />
+        <ContributionLedger />
+      </section>
+
+      <ChapterCut
+        number="03"
+        label="Engineer"
+        statement="Reliable systems make their boundaries visible."
+      />
+
+      <section className="home-section principles-section" id="principles">
+        <SectionHeading
+          number="04"
+          title="How I engineer"
+          copy="Three principles shaped by product work, failure paths, and maintainer review."
+        />
+        <EngineeringPrinciples />
+      </section>
+
       <About />
       <ContactSection />
-    </>
+    </LazyMotion>
   );
 }

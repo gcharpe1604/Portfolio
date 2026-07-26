@@ -22,7 +22,7 @@ export function ContactSection() {
       <div className="contact-grid">
         <div>
           <span className="eyebrow">Available for the right work</span>
-          <h2>Let’s build something meaningful</h2>
+          <h2>Useful software deserves careful engineering.</h2>
         </div>
         <div>
           <p className="contact-copy">
@@ -66,7 +66,11 @@ export function ContactSection() {
               Résumé
             </Link>
           </div>
-          <p className="sr-only" role="status" aria-live="polite">
+          <p
+            className={`copy-status ${message ? "is-visible" : ""}`}
+            role="status"
+            aria-live="polite"
+          >
             {message}
           </p>
         </div>

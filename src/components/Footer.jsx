@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 import { links } from "../data/site";
 import { ExternalLink } from "./ExternalLink";
 
-export function Footer() {
+export function Footer({ home = false }) {
   return (
-    <footer className="site-footer">
+    <footer className={`site-footer ${home ? "site-footer-home" : ""}`}>
       <div className="footer-inner">
         <div>
           <p>Designed and built by Govind Charpe.</p>

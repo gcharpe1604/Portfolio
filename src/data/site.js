@@ -17,7 +17,7 @@ export const site = {
   headline:
     "I build software products and contribute to real open-source systems.",
   introduction:
-    "I’m Govind Charpe, a computer science student focused on backend, full-stack and cloud-native engineering. I build developer tools and automation systems, and contribute reviewed improvements to CNCF Harbor CLI and Sugar Labs Music Blocks.",
+    "I’m Govind Charpe, a software engineering student focused on backend, full-stack, and cloud-native systems. I build developer tools and automation, with reviewed contributions to CNCF Harbor CLI and Sugar Labs Music Blocks.",
   availability:
     "Open to software engineering internships and meaningful open-source collaborations.",
   location: "Bengaluru, India · Open to remote opportunities",
