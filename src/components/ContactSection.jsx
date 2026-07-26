@@ -18,8 +18,8 @@ export function ContactSection() {
   };
 
   return (
-    <section className="contact-section" id="contact">
-      <div className="contact-grid">
+    <section className="contact-section">
+      <div className="contact-grid" id="contact">
         <div>
           <span className="eyebrow">Available for the right work</span>
           <h2>Useful software deserves careful engineering.</h2>

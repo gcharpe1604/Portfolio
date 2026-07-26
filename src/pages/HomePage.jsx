@@ -1,13 +1,14 @@
 import { ArrowDown, ArrowRight, Github } from "lucide-react";
 import { domMax, LazyMotion } from "motion/react";
 import { Link } from "react-router-dom";
+import { AmbientField } from "../components/AmbientField";
 import { ContactSection } from "../components/ContactSection";
 import { ContributionLedger } from "../components/ContributionLedger";
 import { EngineeringPrinciples } from "../components/EngineeringPrinciples";
 import { ExternalLink } from "../components/ExternalLink";
 import { FeatureExplorer } from "../components/FeatureExplorer";
 import { PipelineExplorer } from "../components/PipelineExplorer";
-import { ProofLens } from "../components/ProofDesk";
+import { ProofBrowser } from "../components/ProofDesk";
 import { SectionHeading } from "../components/SectionHeading";
 import { SkillEvidenceMatrix } from "../components/SkillEvidenceMatrix";
 import { aboutRail } from "../data/home";
@@ -20,6 +21,7 @@ function Hero() {
       id="hero"
       aria-labelledby="hero-title"
     >
+      <AmbientField />
       <div className="editorial-hero-grid">
         <div className="editorial-hero-copy">
           <span className="eyebrow">{site.eyebrow}</span>
@@ -42,7 +44,7 @@ function Hero() {
             {site.availability}
           </p>
         </div>
-        <ProofLens />
+        <ProofBrowser />
       </div>
 
       <dl className="proof-stats" aria-label="Portfolio proof statistics">
@@ -63,11 +65,9 @@ function Hero() {
 
 function About() {
   return (
-    <section
-      className="home-section about-section editorial-section"
-      id="about"
-    >
+    <section className="home-section about-section editorial-section">
       <SectionHeading
+        id="about"
         number="05"
         title="About"
         copy="A product builder learning to make sound engineering decisions inside systems that other people rely on."
@@ -111,37 +111,14 @@ function About() {
   );
 }
 
-function ChapterCut({ number, label, statement, tone = "dark" }) {
-  return (
-    <div
-      className={`chapter-cut chapter-cut-${tone}`}
-      aria-label={`${label} chapter`}
-    >
-      <div>
-        <span>{number}</span>
-        <strong>{label}</strong>
-      </div>
-      <p>{statement}</p>
-      <span className="chapter-trace" aria-hidden="true">
-        <i />
-      </span>
-    </div>
-  );
-}
-
 export default function HomePage() {
   return (
     <LazyMotion features={domMax} strict>
       <Hero />
 
-      <ChapterCut
-        number="01"
-        label="Build"
-        statement="Products should explain themselves—and prove their decisions."
-      />
-
-      <section className="home-section selected-work-section" id="work">
+      <section className="home-section selected-work-section">
         <SectionHeading
+          id="work"
           number="01"
           title="Selected work"
           copy="Two different engineering systems: one product for understanding repository history, one workflow for making automated decisions inspectable."
@@ -150,8 +127,9 @@ export default function HomePage() {
         <PipelineExplorer />
       </section>
 
-      <section className="home-section skills-section" id="skills">
+      <section className="home-section skills-section">
         <SectionHeading
+          id="skills"
           number="02"
           title="Skills, with evidence"
           copy="A scannable inventory of tools I have actually used, with context that distinguishes shipped work from growing proficiency."
@@ -159,15 +137,9 @@ export default function HomePage() {
         <SkillEvidenceMatrix />
       </section>
 
-      <ChapterCut
-        number="02"
-        label="Contribute"
-        statement="The strongest claims survive contact with an existing system."
-        tone="paper"
-      />
-
-      <section className="home-section open-source-section" id="open-source">
+      <section className="home-section open-source-section">
         <SectionHeading
+          id="open-source"
           number="03"
           title="Open-source validation"
           copy="Representative changes from Harbor CLI and Music Blocks. Status, implementation evidence, and review context stay tied to the underlying pull requests."
@@ -175,14 +147,9 @@ export default function HomePage() {
         <ContributionLedger />
       </section>
 
-      <ChapterCut
-        number="03"
-        label="Engineer"
-        statement="Reliable systems make their boundaries visible."
-      />
-
-      <section className="home-section principles-section" id="principles">
+      <section className="home-section principles-section">
         <SectionHeading
+          id="principles"
           number="04"
           title="How I engineer"
           copy="Three principles shaped by product work, failure paths, and maintainer review."

@@ -4,17 +4,14 @@ import { Link } from "react-router-dom";
 import { proofRecords } from "../data/home";
 import { ResponsiveImage } from "./ResponsiveImage";
 
-const lensPositions = {
-  product: "24%",
-  terminal: "50%",
-  review: "76%",
-};
-
-export function ProofLens() {
+export function ProofBrowser() {
   const [activeId, setActiveId] = useState(proofRecords[0].id);
   const controlsRef = useRef([]);
   const reduceMotion = useReducedMotion();
   const active = proofRecords.find((record) => record.id === activeId);
+  const activeIndex = proofRecords.findIndex(
+    (record) => record.id === activeId,
+  );
 
   const selectAdjacent = (event, index) => {
     if (
@@ -42,105 +39,89 @@ export function ProofLens() {
   };
 
   return (
-    <div className="proof-lens">
-      <div className="proof-lens-shell">
-        <div className="proof-lens-bar" aria-hidden="true">
-          <span>Evidence instrument</span>
-          <span>GC / 01</span>
-          <span className="proof-lens-live">
-            <i />
-            Live proof
+    <div className="proof-browser">
+      <div className="proof-browser-frame">
+        <div className="proof-browser-bar" aria-hidden="true">
+          <span>Selected evidence</span>
+          <span>
+            {String(activeIndex + 1).padStart(2, "0")} /{" "}
+            {String(proofRecords.length).padStart(2, "0")}
           </span>
         </div>
 
-        <div className="proof-lens-body">
-          <div
-            className="proof-lens-controls"
-            aria-label="Selectable engineering proof"
-          >
-            {proofRecords.map((record, index) => {
-              const selected = activeId === record.id;
+        <div className="proof-browser-stage">
+          <AnimatePresence mode="wait" initial={false}>
+            <m.div
+              key={active.id}
+              className={`proof-browser-visual proof-browser-visual-${active.id}`}
+              initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
+              transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <ResponsiveImage
+                asset={active.asset}
+                loading={active.id === "product" ? "eager" : "lazy"}
+                fetchPriority={active.id === "product" ? "high" : undefined}
+                sizes="(max-width: 767px) 100vw, 620px"
+              />
+            </m.div>
+          </AnimatePresence>
+        </div>
 
-              return (
-                <button
-                  key={record.id}
-                  ref={(element) => {
-                    controlsRef.current[index] = element;
-                  }}
-                  type="button"
-                  aria-pressed={selected}
-                  aria-label={`Select ${record.title} proof`}
-                  tabIndex={selected ? 0 : -1}
-                  onClick={() => setActiveId(record.id)}
-                  onFocus={() => setActiveId(record.id)}
-                  onKeyDown={(event) => selectAdjacent(event, index)}
-                >
-                  {selected ? (
-                    <m.span
-                      className="proof-lens-selection"
-                      layoutId="proof-lens-selection"
-                      transition={{
-                        type: "spring",
-                        stiffness: 420,
-                        damping: 34,
-                      }}
-                    />
-                  ) : null}
-                  <span>{String(index + 1).padStart(2, "0")}</span>
+        <div
+          className="proof-browser-controls"
+          aria-label="Selectable engineering proof"
+        >
+          {proofRecords.map((record, index) => {
+            const selected = activeId === record.id;
+
+            return (
+              <button
+                key={record.id}
+                ref={(element) => {
+                  controlsRef.current[index] = element;
+                }}
+                type="button"
+                aria-pressed={selected}
+                aria-label={`Select ${record.title} proof`}
+                tabIndex={selected ? 0 : -1}
+                onClick={() => setActiveId(record.id)}
+                onFocus={() => setActiveId(record.id)}
+                onKeyDown={(event) => selectAdjacent(event, index)}
+              >
+                {selected ? (
+                  <m.span
+                    className="proof-browser-indicator"
+                    layoutId="proof-browser-indicator"
+                    transition={{
+                      type: "spring",
+                      stiffness: 420,
+                      damping: 36,
+                    }}
+                  />
+                ) : null}
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <span>
                   <strong>{record.label}</strong>
                   <small>{record.title}</small>
-                </button>
-              );
-            })}
-          </div>
-
-          <div
-            className="proof-lens-stage"
-            style={{ "--lens-position": lensPositions[active.id] }}
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              <m.div
-                key={active.id}
-                className={`proof-lens-visual proof-lens-visual-${active.id}`}
-                initial={reduceMotion ? false : { opacity: 0, scale: 1.018 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={
-                  reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.992 }
-                }
-                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <ResponsiveImage
-                  asset={active.asset}
-                  loading={active.id === "product" ? "eager" : "lazy"}
-                  fetchPriority={active.id === "product" ? "high" : undefined}
-                  sizes="(max-width: 767px) 100vw, 520px"
-                />
-              </m.div>
-            </AnimatePresence>
-
-            <span className="proof-lens-grid" aria-hidden="true" />
-            <span className="proof-lens-scan" aria-hidden="true">
-              <i />
-            </span>
-            <span className="proof-lens-coordinate" aria-hidden="true">
-              {active.label} /{" "}
-              {String(proofRecords.indexOf(active) + 1).padStart(2, "0")}
-            </span>
-          </div>
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      <div className="proof-lens-caption" aria-live="polite">
+      <div className="proof-browser-caption" aria-live="polite">
         <AnimatePresence mode="wait" initial={false}>
           <m.div
             key={active.id}
-            className="proof-lens-reading"
+            className="proof-browser-reading"
             initial={reduceMotion ? false : { opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
             transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-            <span>Selected proof</span>
             <p>{active.claim}</p>
             <dl>
               <div>

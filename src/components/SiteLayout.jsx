@@ -37,7 +37,7 @@ export function SiteLayout() {
       <main id="main-content" tabIndex="-1">
         <Outlet />
       </main>
-      <Footer home={location.pathname === "/"} />
+      <Footer />
     </>
   );
 }

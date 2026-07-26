@@ -33,10 +33,7 @@ export function FeatureExplorer() {
   };
 
   return (
-    <article
-      className="feature-explorer project-theatre project-theatre-git"
-      aria-labelledby="gitanalyzer-title"
-    >
+    <article className="feature-explorer" aria-labelledby="gitanalyzer-title">
       <header className="project-editorial-header">
         <div>
           <span className="project-kicker">{project.label}</span>

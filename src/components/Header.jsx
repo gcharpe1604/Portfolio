@@ -23,7 +23,7 @@ function ThemeToggle() {
     document.documentElement.style.colorScheme = next;
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", next === "dark" ? "#0B0D0C" : "#F2EFE6");
+      ?.setAttribute("content", next === "dark" ? "#121211" : "#F5F2EB");
     localStorage.setItem("gc-theme", next);
     setTheme(next);
   };
@@ -96,7 +96,10 @@ export function Header() {
         let current = "hero";
         sectionIds.forEach((id) => {
           const element = document.getElementById(id);
-          if (element && element.offsetTop <= marker) current = id;
+          const elementTop = element
+            ? element.getBoundingClientRect().top + window.scrollY
+            : Number.POSITIVE_INFINITY;
+          if (elementTop <= marker) current = id;
         });
         setActiveSection(current);
         frame = 0;

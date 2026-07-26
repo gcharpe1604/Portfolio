@@ -100,10 +100,7 @@ export function PipelineExplorer() {
   };
 
   return (
-    <article
-      className="pipeline-explorer project-theatre project-theatre-leadflow"
-      aria-labelledby="leadflow-title"
-    >
+    <article className="pipeline-explorer" aria-labelledby="leadflow-title">
       <header className="project-editorial-header">
         <div>
           <span className="project-kicker">{project.label}</span>
