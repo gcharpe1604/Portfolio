@@ -10,6 +10,7 @@ export function ContributionRecord({ contribution, compact = false }) {
       className={`contribution-record ${
         contribution.featured && !compact ? "is-featured" : "is-compact"
       }`}
+      data-status={contribution.statusKey}
     >
       <div className="contribution-meta">
         <StatusBadge

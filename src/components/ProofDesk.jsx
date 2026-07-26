@@ -89,6 +89,7 @@ export function ProofBrowser() {
                 onClick={() => setActiveId(record.id)}
                 onFocus={() => setActiveId(record.id)}
                 onKeyDown={(event) => selectAdjacent(event, index)}
+                data-cursor="Reveal"
               >
                 {selected ? (
                   <m.span

@@ -100,7 +100,14 @@ export function PipelineExplorer() {
   };
 
   return (
-    <article className="pipeline-explorer" aria-labelledby="leadflow-title">
+    <article
+      className="pipeline-explorer project-spread project-leadflow"
+      aria-labelledby="leadflow-title"
+      data-project="leadflow"
+    >
+      <span className="project-chapter-mark" aria-hidden="true">
+        02 / L
+      </span>
       <header className="project-editorial-header">
         <div>
           <span className="project-kicker">{project.label}</span>
@@ -145,6 +152,7 @@ export function PipelineExplorer() {
                 tabIndex={activeId === stage.id ? 0 : -1}
                 onClick={() => setActiveId(stage.id)}
                 onKeyDown={(event) => selectAdjacent(event, index)}
+                data-cursor="Trace"
               >
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <strong>{stage.label}</strong>

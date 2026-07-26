@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
+import { ProofCursor } from "./ProofCursor";
 
 export function SiteLayout() {
   const location = useLocation();
@@ -33,6 +34,16 @@ export function SiteLayout() {
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
+      <ProofCursor />
+      <div
+        key={`${location.pathname}${location.search}`}
+        className="route-curtain"
+        aria-hidden="true"
+      >
+        <span />
+        <span />
+        <span />
+      </div>
       <Header />
       <main id="main-content" tabIndex="-1">
         <Outlet />

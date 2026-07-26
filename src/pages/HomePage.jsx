@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowRight, Github } from "lucide-react";
-import { domMax, LazyMotion } from "motion/react";
+import { domMax, LazyMotion, m, useReducedMotion } from "motion/react";
 import { Link } from "react-router-dom";
 import { AmbientField } from "../components/AmbientField";
 import { ContactSection } from "../components/ContactSection";
@@ -14,37 +14,83 @@ import { SkillEvidenceMatrix } from "../components/SkillEvidenceMatrix";
 import { aboutRail } from "../data/home";
 import { about, links, site, stats } from "../data/site";
 
+function StorySection({ children, className }) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <m.section
+      className={className}
+      initial={reduceMotion ? false : { opacity: 0, y: 42 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.08 }}
+      transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </m.section>
+  );
+}
+
 function Hero() {
   return (
     <section
-      className="editorial-hero engineering-grid"
+      className="editorial-hero working-proof-hero"
       id="hero"
       aria-labelledby="hero-title"
     >
       <AmbientField />
+      <div className="hero-edition-line" aria-hidden="true">
+        <span>Working proof</span>
+        <span>Issue 01 / 2026</span>
+        <span>Bengaluru → anywhere</span>
+      </div>
       <div className="editorial-hero-grid">
         <div className="editorial-hero-copy">
           <span className="eyebrow">{site.eyebrow}</span>
-          <h1 id="hero-title">{site.headline}</h1>
-          <p>{site.introduction}</p>
+          <h1 id="hero-title" aria-label={site.headline}>
+            <span aria-hidden="true">I build software </span>
+            <span className="hero-title-serif" aria-hidden="true">
+              products
+            </span>
+            <span aria-hidden="true"> and contribute to </span>
+            <span className="hero-title-underline" aria-hidden="true">
+              real open-source systems.
+            </span>
+          </h1>
+          <p className="hero-introduction">{site.introduction}</p>
           <div className="hero-actions">
-            <a className="button button-primary" href="#work">
+            <a
+              className="button button-primary"
+              href="#work"
+              data-cursor="Explore"
+            >
               Explore selected work <ArrowDown aria-hidden="true" />
             </a>
-            <Link className="button button-secondary" to={links.resume}>
+            <Link
+              className="button button-secondary"
+              to={links.resume}
+              data-cursor="Read"
+            >
               View résumé <ArrowRight aria-hidden="true" />
             </Link>
           </div>
-          <ExternalLink className="hero-github-link" href={links.github}>
-            <Github aria-hidden="true" />
-            GitHub profile
-          </ExternalLink>
-          <p className="availability">
-            <span aria-hidden="true" />
-            {site.availability}
-          </p>
+          <div className="hero-availability-row">
+            <p className="availability">
+              <span aria-hidden="true" />
+              {site.availability}
+            </p>
+            <ExternalLink className="hero-github-link" href={links.github}>
+              <Github aria-hidden="true" />
+              GitHub profile
+            </ExternalLink>
+          </div>
         </div>
-        <ProofBrowser />
+        <div className="hero-proof-column">
+          <p className="hero-proof-intro">
+            <span>Claim</span>
+            The work is the interface. The evidence is one interaction away.
+          </p>
+          <ProofBrowser />
+        </div>
       </div>
 
       <dl className="proof-stats" aria-label="Portfolio proof statistics">
@@ -55,8 +101,8 @@ function Hero() {
           </div>
         ))}
         <div className="stat-context">
-          <dt>CNCF · Sugar Labs</dt>
-          <dd>Reviewed upstream work</dd>
+          <dt>Product · System · Review</dt>
+          <dd>Three kinds of working proof</dd>
         </div>
       </dl>
     </section>
@@ -65,7 +111,7 @@ function Hero() {
 
 function About() {
   return (
-    <section className="home-section about-section editorial-section">
+    <StorySection className="home-section about-section editorial-section chapter-about">
       <SectionHeading
         id="about"
         number="05"
@@ -107,7 +153,7 @@ function About() {
           </section>
         </aside>
       </div>
-    </section>
+    </StorySection>
   );
 }
 
@@ -116,7 +162,7 @@ export default function HomePage() {
     <LazyMotion features={domMax} strict>
       <Hero />
 
-      <section className="home-section selected-work-section">
+      <StorySection className="home-section selected-work-section chapter-work">
         <SectionHeading
           id="work"
           number="01"
@@ -125,9 +171,9 @@ export default function HomePage() {
         />
         <FeatureExplorer />
         <PipelineExplorer />
-      </section>
+      </StorySection>
 
-      <section className="home-section skills-section">
+      <StorySection className="home-section skills-section chapter-skills">
         <SectionHeading
           id="skills"
           number="02"
@@ -135,9 +181,9 @@ export default function HomePage() {
           copy="A scannable inventory of tools I have actually used, with context that distinguishes shipped work from growing proficiency."
         />
         <SkillEvidenceMatrix />
-      </section>
+      </StorySection>
 
-      <section className="home-section open-source-section">
+      <StorySection className="home-section open-source-section chapter-open-source">
         <SectionHeading
           id="open-source"
           number="03"
@@ -145,9 +191,9 @@ export default function HomePage() {
           copy="Representative changes from Harbor CLI and Music Blocks. Status, implementation evidence, and review context stay tied to the underlying pull requests."
         />
         <ContributionLedger />
-      </section>
+      </StorySection>
 
-      <section className="home-section principles-section">
+      <StorySection className="home-section principles-section chapter-principles">
         <SectionHeading
           id="principles"
           number="04"
@@ -155,7 +201,7 @@ export default function HomePage() {
           copy="Three principles shaped by product work, failure paths, and maintainer review."
         />
         <EngineeringPrinciples />
-      </section>
+      </StorySection>
 
       <About />
       <ContactSection />

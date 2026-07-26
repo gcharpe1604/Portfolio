@@ -61,6 +61,7 @@ export function SkillEvidenceMatrix() {
                       aria-pressed={selected}
                       onClick={() => setActiveSkill(skill)}
                       onFocus={() => setActiveSkill(skill)}
+                      data-cursor="Inspect"
                     >
                       {selected ? (
                         <m.span
@@ -73,7 +74,7 @@ export function SkillEvidenceMatrix() {
                           }}
                         />
                       ) : null}
-                      {skill.name}
+                      <span className="skill-name">{skill.name}</span>
                     </button>
                     {selected && isMobile ? (
                       <SkillProof skill={skill} mobile />

@@ -26,6 +26,7 @@ export function EngineeringPrinciples() {
               aria-expanded={selected}
               aria-controls="principle-evidence"
               onClick={() => setActiveId(principle.id)}
+              data-cursor="Open note"
             >
               <span>{String(index + 1).padStart(2, "0")}</span>
               <span>

@@ -1,13 +1,6 @@
 import { useReducedMotion } from "motion/react";
 import { useEffect, useRef } from "react";
 
-const CENTER = {
-  x: "68%",
-  y: "28%",
-  shiftX: "0px",
-  shiftY: "0px",
-};
-
 export function AmbientField() {
   const fieldRef = useRef(null);
   const frameRef = useRef(0);
@@ -39,15 +32,23 @@ export function AmbientField() {
         field.style.setProperty("--field-y", `${y}%`);
         field.style.setProperty("--field-shift-x", `${shiftX}px`);
         field.style.setProperty("--field-shift-y", `${shiftY}px`);
+        hero.style.setProperty("--hero-x", `${x}%`);
+        hero.style.setProperty("--hero-y", `${y}%`);
+        hero.style.setProperty("--hero-tilt-x", `${(50 - y) * 0.035}deg`);
+        hero.style.setProperty("--hero-tilt-y", `${(x - 50) * 0.045}deg`);
         frameRef.current = 0;
       });
     };
 
     const resetField = () => {
-      field.style.setProperty("--field-x", CENTER.x);
-      field.style.setProperty("--field-y", CENTER.y);
-      field.style.setProperty("--field-shift-x", CENTER.shiftX);
-      field.style.setProperty("--field-shift-y", CENTER.shiftY);
+      field.style.removeProperty("--field-x");
+      field.style.removeProperty("--field-y");
+      field.style.removeProperty("--field-shift-x");
+      field.style.removeProperty("--field-shift-y");
+      hero.style.removeProperty("--hero-x");
+      hero.style.removeProperty("--hero-y");
+      hero.style.removeProperty("--hero-tilt-x");
+      hero.style.removeProperty("--hero-tilt-y");
     };
 
     hero.addEventListener("pointermove", updateField, { passive: true });
@@ -62,20 +63,12 @@ export function AmbientField() {
 
   return (
     <div ref={fieldRef} className="ambient-field" aria-hidden="true">
-      <span className="ambient-field-light" />
-      <svg
-        className="ambient-field-contours"
-        viewBox="0 0 1600 760"
-        preserveAspectRatio="xMidYMid slice"
-      >
-        <path d="M-180 690C90 434 296 724 554 512C808 304 998 482 1250 274C1418 136 1556 168 1744 52" />
-        <path d="M-206 620C54 386 278 650 518 454C764 254 970 420 1210 224C1402 68 1564 122 1768-22" />
-        <path d="M-238 548C10 334 244 580 486 396C716 220 928 356 1168 172C1376 14 1550 84 1778-92" />
-        <path d="M-258 470C-22 280 218 512 450 338C682 164 888 300 1126 120C1338-42 1542 52 1794-168" />
-        <path d="M-286 392C-56 224 180 444 416 282C644 124 850 240 1080 72C1298-88 1514 10 1806-228" />
-        <path d="M-318 306C-96 172 150 378 382 224C604 78 810 184 1038 28C1266-128 1492-24 1816-286" />
-      </svg>
-      <span className="ambient-field-falloff" />
+      <span className="ambient-sheet ambient-sheet-coral" />
+      <span className="ambient-sheet ambient-sheet-gold" />
+      <span className="ambient-word ambient-word-build">BUILD</span>
+      <span className="ambient-word ambient-word-prove">PROVE</span>
+      <span className="ambient-bracket">[</span>
+      <span className="ambient-asterisk">✦</span>
     </div>
   );
 }

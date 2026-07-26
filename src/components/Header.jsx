@@ -23,7 +23,7 @@ function ThemeToggle() {
     document.documentElement.style.colorScheme = next;
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", next === "dark" ? "#121211" : "#F5F2EB");
+      ?.setAttribute("content", next === "dark" ? "#191815" : "#F3EFE5");
     localStorage.setItem("gc-theme", next);
     setTheme(next);
   };
@@ -53,6 +53,7 @@ export function Header() {
   );
   const menuButtonRef = useRef(null);
   const sheetRef = useRef(null);
+  const progressRef = useRef(null);
   const location = useLocation();
   const isActive = (item) => {
     if (item.id === "work") {
@@ -71,7 +72,16 @@ export function Header() {
   };
 
   useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 48);
+    const update = () => {
+      setScrolled(window.scrollY > 48);
+      const distance =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const progress = distance > 0 ? window.scrollY / distance : 0;
+      progressRef.current?.style.setProperty(
+        "--scroll-progress",
+        `${Math.min(1, Math.max(0, progress))}`,
+      );
+    };
     update();
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
@@ -153,20 +163,29 @@ export function Header() {
 
   return (
     <header className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
+      <span
+        ref={progressRef}
+        className="site-scroll-progress"
+        aria-hidden="true"
+      />
       <div className="header-inner">
         <Link className="brand" to="/" aria-label="Govind Charpe, home">
           <span className="brand-mark">{site.monogram}</span>
-          <span>{site.name}</span>
+          <span className="brand-name">
+            <strong>{site.name}</strong>
+            <small>Working proof / 2026</small>
+          </span>
         </Link>
 
         <nav className="desktop-nav" aria-label="Primary navigation">
-          {navigation.map((item) => (
+          {navigation.map((item, index) => (
             <Link
               key={item.label}
               to={item.to}
               className={isActive(item) ? "nav-link is-active" : "nav-link"}
               aria-current={isActive(item) ? "page" : undefined}
             >
+              <span>{String(index + 1).padStart(2, "0")}</span>
               {item.label}
             </Link>
           ))}

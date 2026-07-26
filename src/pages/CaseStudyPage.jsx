@@ -242,11 +242,19 @@ export default function CaseStudyPage() {
     : "live";
 
   return (
-    <article className="case-study-page">
-      <header className="case-hero grid-surface">
-        <Link className="breadcrumb" to="/#work">
-          {study.breadcrumb}
-        </Link>
+    <article className={`case-study-page case-${projectSlug}`}>
+      <header className="case-hero">
+        <span className="case-hero-word" aria-hidden="true">
+          {study.title}
+        </span>
+        <div className="case-hero-topline">
+          <Link className="breadcrumb" to="/#work">
+            {study.breadcrumb}
+          </Link>
+          <span>
+            Case study / {projectSlug === "gitanalyzer" ? "01" : "02"}
+          </span>
+        </div>
         <div className="case-hero-grid">
           <div>
             <StatusBadge status={study.status} statusKey={statusKey} />
@@ -326,6 +334,7 @@ export default function CaseStudyPage() {
               key={section.id}
               id={section.id}
               className={`case-section case-section-${section.id}`}
+              data-section={String(index + 1).padStart(2, "0")}
             >
               <header>
                 <span>{String(index + 1).padStart(2, "0")}</span>

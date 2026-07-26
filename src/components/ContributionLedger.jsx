@@ -135,6 +135,7 @@ export function ContributionLedger() {
                       : "ledger-evidence"
                   }
                   onClick={() => setActiveNumber(contribution.number)}
+                  data-cursor="Evidence"
                 >
                   {selected ? (
                     <m.span

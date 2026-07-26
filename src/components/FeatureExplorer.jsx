@@ -33,7 +33,14 @@ export function FeatureExplorer() {
   };
 
   return (
-    <article className="feature-explorer" aria-labelledby="gitanalyzer-title">
+    <article
+      className="feature-explorer project-spread project-gitanalyzer"
+      aria-labelledby="gitanalyzer-title"
+      data-project="gitanalyzer"
+    >
+      <span className="project-chapter-mark" aria-hidden="true">
+        01 / G
+      </span>
       <header className="project-editorial-header">
         <div>
           <span className="project-kicker">{project.label}</span>
@@ -61,6 +68,7 @@ export function FeatureExplorer() {
             tabIndex={activeId === feature.id ? 0 : -1}
             onClick={() => setActiveId(feature.id)}
             onKeyDown={(event) => selectAdjacent(event, index)}
+            data-cursor="Inspect"
           >
             {activeId === feature.id ? (
               <m.span

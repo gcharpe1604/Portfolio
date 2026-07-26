@@ -18,11 +18,14 @@ export function ContactSection() {
   };
 
   return (
-    <section className="contact-section">
+    <section className="contact-section" data-section-tone="contact">
       <div className="contact-grid" id="contact">
         <div>
           <span className="eyebrow">Available for the right work</span>
           <h2>Useful software deserves careful engineering.</h2>
+          <span className="contact-asterisk" aria-hidden="true">
+            ✦
+          </span>
         </div>
         <div>
           <p className="contact-copy">

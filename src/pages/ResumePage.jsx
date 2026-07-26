@@ -4,6 +4,9 @@ export default function ResumePage() {
   return (
     <div className="resume-page">
       <header>
+        <span className="resume-page-word" aria-hidden="true">
+          CV
+        </span>
         <span className="eyebrow">Résumé</span>
         <h1>Govind Charpe</h1>
         <p>
