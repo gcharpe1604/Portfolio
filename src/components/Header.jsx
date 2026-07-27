@@ -102,7 +102,11 @@ export function Header() {
     const update = () => {
       if (frame) return;
       frame = window.requestAnimationFrame(() => {
-        const marker = window.scrollY + 180;
+        const viewportMarker = Math.min(
+          340,
+          Math.max(180, window.innerHeight * 0.38),
+        );
+        const marker = window.scrollY + viewportMarker;
         let current = "hero";
         sectionIds.forEach((id) => {
           const element = document.getElementById(id);
@@ -117,8 +121,10 @@ export function Header() {
     };
     update();
     window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update, { passive: true });
     return () => {
       window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, [location.pathname]);
@@ -173,7 +179,6 @@ export function Header() {
           <span className="brand-mark">{site.monogram}</span>
           <span className="brand-name">
             <strong>{site.name}</strong>
-            <small>Working proof / 2026</small>
           </span>
         </Link>
 
@@ -192,6 +197,7 @@ export function Header() {
         </nav>
 
         <div className="header-actions">
+          <span className="header-edition">Working proof / 2026</span>
           <Link className="header-resume-link" to={links.resume}>
             View résumé
           </Link>
@@ -253,7 +259,12 @@ export function Header() {
             </div>
             <nav aria-label="Mobile navigation">
               {navigation.map((item, index) => (
-                <Link key={item.label} to={item.to}>
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  className={isActive(item) ? "is-active" : undefined}
+                  aria-current={isActive(item) ? "page" : undefined}
+                >
                   <span>{String(index + 1).padStart(2, "0")}</span>
                   {item.label}
                 </Link>

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { pipelineStages } from "../data/home";
 import { projects } from "../data/site";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { AnimatedBeam } from "./AnimatedBeam";
 import { ExternalLink } from "./ExternalLink";
 import { MediaDialog } from "./MediaDialog";
 import { ResponsiveImage } from "./ResponsiveImage";
@@ -66,6 +67,8 @@ function PipelineEvidence({ stage, compact = false }) {
 export function PipelineExplorer() {
   const [activeId, setActiveId] = useState(pipelineStages[0].id);
   const tabsRef = useRef([]);
+  const trackRef = useRef(null);
+  const nodeRefs = useRef(pipelineStages.map(() => ({ current: null })));
   const reduceMotion = useReducedMotion();
   const isMobile = useMediaQuery("(max-width: 767px)");
   const activeIndex = pipelineStages.findIndex(
@@ -118,6 +121,7 @@ export function PipelineExplorer() {
 
       <div className="pipeline-stage">
         <div
+          ref={trackRef}
           className="pipeline-track"
           role="tablist"
           aria-label="LeadFlow pipeline stages"
@@ -135,6 +139,20 @@ export function PipelineExplorer() {
               transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
             />
           </span>
+          {!isMobile && !reduceMotion ? (
+            <AnimatedBeam
+              containerRef={trackRef}
+              fromRef={nodeRefs.current[0]}
+              toRef={nodeRefs.current[nodeRefs.current.length - 1]}
+              pathColor="var(--line-strong)"
+              pathOpacity={0.28}
+              pathWidth={3}
+              gradientStartColor="var(--leadflow)"
+              gradientStopColor="var(--gold)"
+              duration={4.0}
+              repeatDelay={0.8}
+            />
+          ) : null}
           {pipelineStages.map((stage, index) => (
             <div className="pipeline-step-wrap" key={stage.id}>
               <button
@@ -154,7 +172,13 @@ export function PipelineExplorer() {
                 onKeyDown={(event) => selectAdjacent(event, index)}
                 data-cursor="Trace"
               >
-                <span>{String(index + 1).padStart(2, "0")}</span>
+                <span
+                  ref={(element) => {
+                    nodeRefs.current[index].current = element;
+                  }}
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
                 <strong>{stage.label}</strong>
               </button>
               <div

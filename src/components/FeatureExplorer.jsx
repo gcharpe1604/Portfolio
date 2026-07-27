@@ -1,5 +1,5 @@
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
-import { ArrowRight, ExternalLink as ExternalLinkIcon } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { projectFeatures } from "../data/home";
@@ -81,8 +81,10 @@ export function FeatureExplorer() {
                 }}
               />
             ) : null}
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            {feature.label}
+            <span className="feature-tab-number">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span className="feature-tab-label">{feature.label}</span>
           </button>
         ))}
       </div>
@@ -155,7 +157,7 @@ export function FeatureExplorer() {
             Live product
           </ExternalLink>
           <ExternalLink className="text-link" href={project.links.source}>
-            Source code <ExternalLinkIcon aria-hidden="true" />
+            Source code
           </ExternalLink>
         </div>
       </footer>

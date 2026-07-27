@@ -180,6 +180,23 @@ describe("portfolio routes and interactions", () => {
     expect(
       await screen.findByText("Growing through reviewed open source"),
     ).toBeInTheDocument();
+
+    const ciSkill = screen.getByRole("button", {
+      name: "CI/CD fundamentals",
+    });
+    await user.click(ciSkill);
+    expect(ciSkill).toHaveAttribute("aria-pressed", "true");
+    const ciHeading = await screen.findByRole(
+      "heading",
+      {
+        level: 3,
+        name: /CI\/CD\s*fundamentals/,
+      },
+      { timeout: 5000 },
+    );
+    expect(ciHeading.querySelector(".skill-heading-line")).toHaveTextContent(
+      "fundamentals",
+    );
   });
 
   it("stores organization and status filters in the URL", async () => {
@@ -225,6 +242,18 @@ describe("portfolio routes and interactions", () => {
     await user.click(trigger);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("open");
+
+    const zoom = within(dialog).getByRole("button", {
+      name: "Zoom evidence image for detail",
+    });
+    await user.click(zoom);
+    expect(zoom).toHaveAttribute("aria-pressed", "true");
+    expect(zoom).toHaveAccessibleName("Fit evidence image to dialog");
+    expect(
+      within(dialog).getByLabelText(
+        "Zoomed evidence image. Scroll horizontally and vertically to inspect details.",
+      ),
+    ).toHaveAttribute("tabindex", "0");
 
     await user.click(
       within(dialog).getByRole("button", {

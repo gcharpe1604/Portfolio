@@ -1,4 +1,12 @@
-import { Check, Copy, Github, Linkedin, Mail } from "lucide-react";
+import {
+  ArrowUpRight,
+  Check,
+  Copy,
+  Github,
+  Linkedin,
+  Mail,
+  Twitter,
+} from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { links, site } from "../data/site";
@@ -57,16 +65,24 @@ export function ContactSection() {
               <Mail aria-hidden="true" />
               Open mail client
             </a>
-            <ExternalLink href={links.linkedIn} className="icon-text-link">
+            <ExternalLink href={links.linkedIn} className="contact-action-link">
               <Linkedin aria-hidden="true" />
               LinkedIn
             </ExternalLink>
-            <ExternalLink href={links.github} className="icon-text-link">
+            <ExternalLink href={links.github} className="contact-action-link">
               <Github aria-hidden="true" />
               GitHub
             </ExternalLink>
-            <Link className="text-link" to={links.resume}>
-              Résumé
+            <ExternalLink href={links.twitter} className="contact-action-link">
+              <Twitter aria-hidden="true" />
+              Twitter
+            </ExternalLink>
+            <Link
+              className="contact-action-link contact-resume-link"
+              to={links.resume}
+            >
+              <span>Résumé</span>
+              <ArrowUpRight aria-hidden="true" />
             </Link>
           </div>
           <p

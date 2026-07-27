@@ -11,6 +11,14 @@ const firstSkill = skillGroups[0].skills[0];
 function SkillProof({ skill, mobile = false }) {
   const reduceMotion = useReducedMotion();
   const external = skill.href?.startsWith("http");
+  const skillHeading =
+    skill.name === "CI/CD fundamentals" ? (
+      <>
+        CI/CD <span className="skill-heading-line">fundamentals</span>
+      </>
+    ) : (
+      skill.name
+    );
   const link = skill.href ? (
     external ? (
       <ExternalLink href={skill.href}>Open related proof</ExternalLink>
@@ -32,7 +40,7 @@ function SkillProof({ skill, mobile = false }) {
         transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
       >
         <span>Selected skill</span>
-        <h3>{skill.name}</h3>
+        <h3>{skillHeading}</h3>
         <p>{skill.context}</p>
         <strong>{skill.depth}</strong>
         {link}

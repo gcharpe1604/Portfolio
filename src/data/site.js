@@ -3,6 +3,7 @@ import { assets, musicBlocksVideo } from "./assets";
 export const links = {
   github: "https://github.com/gcharpe1604",
   linkedIn: "https://www.linkedin.com/in/govind-charpe",
+  twitter: "https://x.com/g_charpe16",
   email: "govind.charpe16@gmail.com",
   gitAnalyzerSource: "https://github.com/gcharpe1604/gitanalyzer",
   gitAnalyzerLive: "https://gitanalyzer-ai.netlify.app/",

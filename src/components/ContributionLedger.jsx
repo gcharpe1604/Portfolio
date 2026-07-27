@@ -50,7 +50,7 @@ export function EvidenceViewer({ contribution, compact = false }) {
         <div className="evidence-viewer-copy">
           <p>{contribution.description}</p>
           <ExternalLink href={contribution.link}>
-            View pull request <ArrowRight aria-hidden="true" />
+            View pull request
           </ExternalLink>
         </div>
       </m.article>
@@ -108,7 +108,18 @@ export function ContributionLedger() {
               onClick={() => selectOrganization(org.id)}
               onKeyDown={(event) => selectAdjacentOrganization(event, index)}
             >
-              {org.name}
+              {organization === org.id ? (
+                <m.span
+                  className="ledger-switch-selection"
+                  layoutId="ledger-switch-selection"
+                  transition={{
+                    type: "spring",
+                    stiffness: 460,
+                    damping: 36,
+                  }}
+                />
+              ) : null}
+              <span className="ledger-switch-label">{org.name}</span>
             </button>
           ))}
         </div>
