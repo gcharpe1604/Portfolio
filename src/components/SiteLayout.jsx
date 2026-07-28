@@ -1,13 +1,8 @@
-import { lazy, Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { ProofCursor } from "./ProofCursor";
-
-const DevAgentation =
-  import.meta.env.DEV && import.meta.env.MODE !== "test"
-    ? lazy(() => import("./DevAgentation"))
-    : null;
 
 const routeMetadata = {
   "/": {
@@ -96,11 +91,6 @@ export function SiteLayout() {
         <Outlet />
       </main>
       <Footer />
-      {DevAgentation ? (
-        <Suspense fallback={null}>
-          <DevAgentation />
-        </Suspense>
-      ) : null}
     </>
   );
 }
