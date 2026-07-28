@@ -24,7 +24,7 @@ export function GitAnalyzerShowcase() {
           <ResponsiveImage
             asset={project.image}
             loading="lazy"
-            sizes="(max-width: 767px) 100vw, 1180px"
+            sizes="(max-width: 47.9375rem) 100vw, 73.75rem"
           />
           <div className="image-hotspots" aria-label="GitAnalyzer details">
             {gitAnalyzerDetails.map((detail, index) => (

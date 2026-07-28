@@ -25,7 +25,7 @@ export default function OpenSourcePage() {
     const next = new URLSearchParams(searchParams);
     if (value === "all") next.delete(key);
     else next.set(key, value);
-    setSearchParams(next, { replace: true });
+    setSearchParams(next);
   };
 
   const filtered = useMemo(
@@ -201,7 +201,7 @@ export default function OpenSourcePage() {
             <button
               type="button"
               className="button button-secondary"
-              onClick={() => setSearchParams({}, { replace: true })}
+              onClick={() => setSearchParams({})}
             >
               Clear filters
             </button>

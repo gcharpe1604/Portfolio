@@ -91,7 +91,7 @@ export function MediaDialog({ asset, label = "Expand image", caption }) {
           <div
             id={canvasId}
             className={`media-dialog-canvas${zoomed ? " is-zoomed" : ""}`}
-            style={{ "--dialog-image-width": `${asset.width}px` }}
+            style={{ "--dialog-image-width": `${asset.width / 16}rem` }}
             tabIndex={zoomed ? 0 : -1}
             aria-label={
               zoomed
@@ -104,8 +104,8 @@ export function MediaDialog({ asset, label = "Expand image", caption }) {
               loading="eager"
               sizes={
                 zoomed
-                  ? "(max-width: 767px) 1200px, 96vw"
-                  : "(max-width: 767px) 96vw, 96vw"
+                  ? "(max-width: 47.9375rem) 75rem, 96vw"
+                  : "(max-width: 47.9375rem) 96vw, 96vw"
               }
               className="dialog-image"
             />

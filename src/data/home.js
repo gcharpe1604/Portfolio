@@ -1,5 +1,5 @@
 import { assets, musicBlocksVideo } from "./assets";
-import { contributions, links, projects } from "./site";
+import { contributions, projects } from "./site";
 
 const contributionByNumber = (number) =>
   contributions.find((contribution) => contribution.number === number);
@@ -302,61 +302,6 @@ export const contributionEvidence = {
   harbor: [849, 930, 1030].map(contributionByNumber),
   musicblocks: [6602, 6316].map(contributionByNumber),
 };
-
-export const engineeringPrinciples = [
-  {
-    id: "reliability",
-    label: "Reliability and failure handling",
-    statement:
-      "Make failure explicit, preserve useful error identity, and test the path users feel when something goes wrong.",
-    detail:
-      "My Music Blocks and Harbor CLI work includes standardizing thrown errors, propagating command failures, validating incompatible inputs, and keeping automation-facing exit behaviour meaningful.",
-    artifact: assets.musicBlocksDiff,
-    artifactLabel: "Standard Error objects and updated tests in Music Blocks",
-    links: [
-      {
-        label: "Music Blocks evidence",
-        href: "/open-source?org=musicblocks",
-      },
-      { label: "Harbor CLI evidence", href: "/open-source?org=harbor" },
-    ],
-  },
-  {
-    id: "data-flow",
-    label: "API and data-flow design",
-    statement:
-      "Keep transformations, decisions, and provider boundaries visible enough to debug.",
-    detail:
-      "LeadFlow uses a canonical model, versioned policy, explicit qualification reasons, manual-review boundaries, and adapter-ready dispatch plans rather than one opaque AI response.",
-    artifact: assets.leadFlowRouting,
-    artifactLabel: "LeadFlow routing and dispatch plan",
-    links: [
-      { label: "LeadFlow case study", href: projects.leadFlow.links.caseStudy },
-      {
-        label: "GitAnalyzer case study",
-        href: projects.gitAnalyzer.links.caseStudy,
-      },
-    ],
-  },
-  {
-    id: "collaboration",
-    label: "Open-source collaboration",
-    statement:
-      "Understand the system first, make the smallest complete change, and treat review as engineering input.",
-    detail:
-      "Contributing to Harbor CLI and Music Blocks means working inside existing architecture, adding focused tests, responding to maintainers, and keeping claims tied to observable pull-request state.",
-    artifact: assets.harborReview,
-    artifactLabel: "Maintainer approval evidence for Harbor CLI PR #930",
-    links: [
-      { label: "Contribution ledger", href: "/open-source" },
-      {
-        label: "GitHub profile",
-        href: links.github,
-        external: true,
-      },
-    ],
-  },
-];
 
 export const aboutRail = [
   {

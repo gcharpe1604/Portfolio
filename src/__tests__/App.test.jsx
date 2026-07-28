@@ -47,10 +47,10 @@ describe("portfolio routes and interactions", () => {
       screen.getByRole("heading", { name: "Selected work" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Skills, with evidence" }),
+      screen.getByRole("heading", { name: "Skills With evidence" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: "Open-source validation" }),
+      screen.getByRole("heading", { name: "Open-source Validation" }),
     ).toBeInTheDocument();
     expect(
       screen.getAllByRole("link", { name: "View résumé" }).length,
@@ -67,6 +67,7 @@ describe("portfolio routes and interactions", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: "GitAnalyzer" }),
     ).toBeInTheDocument();
+    expect(document.title).toBe("GitAnalyzer Case Study — Govind Charpe");
     view.unmount();
 
     view = renderAt("/work/leadflow");
@@ -151,6 +152,28 @@ describe("portfolio routes and interactions", () => {
     ).toBeInTheDocument();
   });
 
+  it("supports arrow-key navigation in case-study walkthrough tabs", async () => {
+    const user = userEvent.setup();
+    renderAt("/work/gitanalyzer");
+    await screen.findByRole("heading", { level: 1, name: "GitAnalyzer" });
+
+    const firstTab = screen.getByRole("tab", {
+      name: /^01\s*Explainable scoring$/,
+    });
+    firstTab.focus();
+    await user.keyboard("{End}");
+
+    const lastTab = screen.getByRole("tab", {
+      name: /^03\s*Diff-grounded AI assistance$/,
+    });
+    expect(lastTab).toHaveFocus();
+    expect(lastTab).toHaveAttribute("aria-selected", "true");
+
+    await user.keyboard("{ArrowRight}");
+    expect(firstTab).toHaveFocus();
+    expect(firstTab).toHaveAttribute("aria-selected", "true");
+  });
+
   it("selects proof, pipeline, and skill evidence with explicit controls", async () => {
     const user = userEvent.setup();
     renderAt("/");
@@ -197,6 +220,16 @@ describe("portfolio routes and interactions", () => {
     expect(ciHeading.querySelector(".skill-heading-line")).toHaveTextContent(
       "fundamentals",
     );
+  });
+
+  it("keeps contribution previews focused on status and evidence", async () => {
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+
+    expect(screen.queryByText("Feature")).not.toBeInTheDocument();
+    expect(screen.queryByText("Improvement")).not.toBeInTheDocument();
+    expect(screen.getByText("Merged")).toBeInTheDocument();
+    expect(screen.getByText("Approved · Awaiting merge")).toBeInTheDocument();
   });
 
   it("stores organization and status filters in the URL", async () => {

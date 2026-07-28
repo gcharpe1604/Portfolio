@@ -39,7 +39,7 @@ export function ContributionRecord({ contribution, compact = false }) {
         <figure className="evidence-figure">
           <ResponsiveImage
             asset={contribution.asset}
-            sizes="(max-width: 767px) 100vw, 62vw"
+            sizes="(max-width: 47.9375rem) calc(100vw - 2.5rem), 42rem"
           />
           <figcaption>
             <span>

@@ -32,7 +32,7 @@ export function EvidenceViewer({ contribution, compact = false }) {
           <figure className="evidence-viewer-media evidence-frame">
             <ResponsiveImage
               asset={contribution.asset}
-              sizes="(max-width: 767px) 100vw, 620px"
+              sizes="(max-width: 47.9375rem) 100vw, 38.75rem"
             />
             <figcaption>
               <span>Repository evidence for PR #{contribution.number}</span>
@@ -65,7 +65,7 @@ export function ContributionLedger() {
   );
   const organizationTabsRef = useRef([]);
   const visible = contributionEvidence[organization];
-  const isMobile = useMediaQuery("(max-width: 767px)");
+  const isMobile = useMediaQuery("(max-width: 47.9375rem)");
   const active =
     visible.find((contribution) => contribution.number === activeNumber) ??
     visible[0];

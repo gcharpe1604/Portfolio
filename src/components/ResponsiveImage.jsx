@@ -3,7 +3,7 @@ export function ResponsiveImage({
   className = "",
   loading = "lazy",
   fetchPriority,
-  sizes = "(max-width: 767px) 100vw, 80vw",
+  sizes = "(max-width: 47.9375rem) 100vw, 80vw",
   ...props
 }) {
   return (

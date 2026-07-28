@@ -26,8 +26,18 @@ export function ProofCursor() {
     const updatePosition = (event) => {
       if (frameRef.current) window.cancelAnimationFrame(frameRef.current);
       frameRef.current = window.requestAnimationFrame(() => {
-        cursor.style.setProperty("--cursor-x", `${event.clientX}px`);
-        cursor.style.setProperty("--cursor-y", `${event.clientY}px`);
+        const rootFontSize =
+          Number.parseFloat(
+            window.getComputedStyle(document.documentElement).fontSize,
+          ) || 16;
+        cursor.style.setProperty(
+          "--cursor-x",
+          `${event.clientX / rootFontSize}rem`,
+        );
+        cursor.style.setProperty(
+          "--cursor-y",
+          `${event.clientY / rootFontSize}rem`,
+        );
         cursor.dataset.visible = "true";
         frameRef.current = 0;
       });

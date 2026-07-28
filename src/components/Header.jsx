@@ -1,6 +1,7 @@
 import { Github, Menu, Moon, Sun, X } from "lucide-react";
+import { useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { links, site } from "../data/site";
 import { ExternalLink } from "./ExternalLink";
 
@@ -55,6 +56,32 @@ export function Header() {
   const sheetRef = useRef(null);
   const progressRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
+
+  const returnHome = (event) => {
+    if (
+      location.pathname !== "/" ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    if (location.search || location.hash) navigate("/");
+    window.requestAnimationFrame(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: reduceMotion ? "auto" : "smooth",
+      });
+    });
+  };
+
   const isActive = (item) => {
     if (item.id === "work") {
       return (
@@ -94,7 +121,6 @@ export function Header() {
       "work",
       "skills",
       "open-source",
-      "principles",
       "about",
       "contact",
     ];
@@ -175,7 +201,12 @@ export function Header() {
         aria-hidden="true"
       />
       <div className="header-inner">
-        <Link className="brand" to="/" aria-label="Govind Charpe, home">
+        <Link
+          className="brand"
+          to="/"
+          aria-label="Govind Charpe, home"
+          onClick={returnHome}
+        >
           <span className="brand-mark">{site.monogram}</span>
           <span className="brand-name">
             <strong>{site.name}</strong>
@@ -197,7 +228,6 @@ export function Header() {
         </nav>
 
         <div className="header-actions">
-          <span className="header-edition">Working proof / 2026</span>
           <Link className="header-resume-link" to={links.resume}>
             View résumé
           </Link>

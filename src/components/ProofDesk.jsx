@@ -63,7 +63,7 @@ export function ProofBrowser() {
                 asset={active.asset}
                 loading={active.id === "product" ? "eager" : "lazy"}
                 fetchPriority={active.id === "product" ? "high" : undefined}
-                sizes="(max-width: 767px) 100vw, 620px"
+                sizes="(max-width: 47.9375rem) 100vw, 38.75rem"
               />
             </m.div>
           </AnimatePresence>

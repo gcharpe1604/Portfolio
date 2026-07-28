@@ -27,11 +27,21 @@ export function AmbientField() {
         );
         const shiftX = (x - 50) * 0.16;
         const shiftY = (y - 50) * 0.1;
+        const rootFontSize =
+          Number.parseFloat(
+            window.getComputedStyle(document.documentElement).fontSize,
+          ) || 16;
 
         field.style.setProperty("--field-x", `${x}%`);
         field.style.setProperty("--field-y", `${y}%`);
-        field.style.setProperty("--field-shift-x", `${shiftX}px`);
-        field.style.setProperty("--field-shift-y", `${shiftY}px`);
+        field.style.setProperty(
+          "--field-shift-x",
+          `${shiftX / rootFontSize}rem`,
+        );
+        field.style.setProperty(
+          "--field-shift-y",
+          `${shiftY / rootFontSize}rem`,
+        );
         hero.style.setProperty("--hero-x", `${x}%`);
         hero.style.setProperty("--hero-y", `${y}%`);
         hero.style.setProperty("--hero-tilt-x", `${(50 - y) * 0.035}deg`);

@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { AmbientField } from "../components/AmbientField";
 import { ContactSection } from "../components/ContactSection";
 import { ContributionLedger } from "../components/ContributionLedger";
-import { EngineeringPrinciples } from "../components/EngineeringPrinciples";
 import { ExternalLink } from "../components/ExternalLink";
 import { FeatureExplorer } from "../components/FeatureExplorer";
 import { PipelineExplorer } from "../components/PipelineExplorer";
@@ -80,7 +79,7 @@ function Hero() {
             </p>
             <ExternalLink className="hero-github-link" href={links.github}>
               <Github aria-hidden="true" />
-              GitHub profile
+              View GitHub
             </ExternalLink>
           </div>
         </div>
@@ -114,17 +113,17 @@ function About() {
     <StorySection className="home-section about-section editorial-section chapter-about">
       <SectionHeading
         id="about"
-        number="05"
+        number="04"
         title="About"
-        copy="A product builder learning to make sound engineering decisions inside systems that other people rely on."
+        copy="A product builder making sound engineering decisions in systems people rely on."
       />
       <div className="about-editorial-grid">
         <div className="about-editorial-copy">
           <p>{about.paragraphs[0]}</p>
           <p>{about.paragraphs[1]}</p>
           <blockquote>
-            Building products taught me ownership. Working in existing systems
-            taught me judgment.
+            “Building products taught me ownership. Working in existing systems
+            taught me judgment.”
           </blockquote>
           <p>{about.paragraphs[2]}</p>
         </div>
@@ -177,7 +176,8 @@ export default function HomePage() {
         <SectionHeading
           id="skills"
           number="02"
-          title="Skills, with evidence"
+          title="Skills"
+          subtitle="With evidence"
           copy="A scannable inventory of tools I have actually used, with context that distinguishes shipped work from growing proficiency."
         />
         <SkillEvidenceMatrix />
@@ -187,20 +187,11 @@ export default function HomePage() {
         <SectionHeading
           id="open-source"
           number="03"
-          title="Open-source validation"
+          title="Open-source"
+          subtitle="Validation"
           copy="Representative changes from Harbor CLI and Music Blocks. Status, implementation evidence, and review context stay tied to the underlying pull requests."
         />
         <ContributionLedger />
-      </StorySection>
-
-      <StorySection className="home-section principles-section chapter-principles">
-        <SectionHeading
-          id="principles"
-          number="04"
-          title="How I engineer"
-          copy="Three principles shaped by product work, failure paths, and maintainer review."
-        />
-        <EngineeringPrinciples />
       </StorySection>
 
       <About />

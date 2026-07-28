@@ -1,5 +1,5 @@
 import { Check, Copy, ExternalLink as ExternalIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArchitectureDiagram } from "../components/ArchitectureDiagram";
 import { ExternalLink } from "../components/ExternalLink";
@@ -38,7 +38,24 @@ function CopySectionLink({ id }) {
 
 function Walkthrough({ items }) {
   const [activeId, setActiveId] = useState(items[0].id);
+  const tabsRef = useRef([]);
   const active = items.find((item) => item.id === activeId);
+
+  const selectAdjacent = (event, index) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+      return;
+    }
+
+    event.preventDefault();
+    let nextIndex = index;
+    if (event.key === "ArrowLeft") nextIndex = index - 1;
+    if (event.key === "ArrowRight") nextIndex = index + 1;
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = items.length - 1;
+    nextIndex = (nextIndex + items.length) % items.length;
+    setActiveId(items[nextIndex].id);
+    tabsRef.current[nextIndex]?.focus();
+  };
 
   return (
     <>
@@ -47,12 +64,17 @@ function Walkthrough({ items }) {
           {items.map((item, index) => (
             <button
               key={item.id}
+              ref={(element) => {
+                tabsRef.current[index] = element;
+              }}
               type="button"
               role="tab"
               aria-selected={activeId === item.id}
               aria-controls={`panel-${item.id}`}
               id={`tab-${item.id}`}
+              tabIndex={activeId === item.id ? 0 : -1}
               onClick={() => setActiveId(item.id)}
+              onKeyDown={(event) => selectAdjacent(event, index)}
             >
               <span>{String(index + 1).padStart(2, "0")}</span>
               {item.label}
@@ -67,7 +89,7 @@ function Walkthrough({ items }) {
         >
           <ResponsiveImage
             asset={active.asset}
-            sizes="(max-width: 1023px) 90vw, 760px"
+            sizes="(max-width: 63.9375rem) 90vw, 47.5rem"
           />
           <div>
             <p>{active.summary}</p>
@@ -132,7 +154,7 @@ function SectionContent({ section }) {
             <figure key={item.title}>
               <ResponsiveImage
                 asset={item.asset}
-                sizes="(max-width: 1023px) 92vw, 760px"
+                sizes="(max-width: 63.9375rem) 92vw, 47.5rem"
               />
               <figcaption>
                 <div>
@@ -208,21 +230,48 @@ export default function CaseStudyPage() {
   );
 
   useEffect(() => {
-    if (!study || !("IntersectionObserver" in window)) return undefined;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) setActiveSection(visible[0].target.id);
-      },
-      { rootMargin: "-18% 0px -68%", threshold: [0, 0.2, 0.6] },
-    );
-    study.sections.forEach((section) => {
-      const element = document.getElementById(section.id);
-      if (element) observer.observe(element);
+    if (!study) return undefined;
+
+    let frameId;
+    const updateActiveSection = () => {
+      const bottomThreshold = window.innerHeight * 0.01;
+      const isAtBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - bottomThreshold;
+
+      if (isAtBottom) {
+        setActiveSection(study.sections.at(-1)?.id || "");
+        return;
+      }
+
+      const readingLine = window.innerHeight * 0.32;
+      const currentSection = study.sections.reduce((active, section) => {
+        const element = document.getElementById(section.id);
+        if (!element || element.getBoundingClientRect().top > readingLine) {
+          return active;
+        }
+        return section.id;
+      }, study.sections[0]?.id || "");
+
+      setActiveSection(currentSection);
+    };
+
+    const scheduleUpdate = () => {
+      window.cancelAnimationFrame(frameId);
+      frameId = window.requestAnimationFrame(updateActiveSection);
+    };
+
+    window.addEventListener("scroll", scheduleUpdate, {
+      passive: true,
     });
-    return () => observer.disconnect();
+    window.addEventListener("resize", scheduleUpdate);
+    updateActiveSection();
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+    };
   }, [study]);
 
   if (!study) {
@@ -288,7 +337,7 @@ export default function CaseStudyPage() {
               asset={study.heroAsset}
               loading="eager"
               fetchPriority="high"
-              sizes="(max-width: 1023px) 92vw, 720px"
+              sizes="(max-width: 63.9375rem) 92vw, 45rem"
             />
             <MediaDialog
               asset={study.heroAsset}

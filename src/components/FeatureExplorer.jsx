@@ -112,7 +112,7 @@ export function FeatureExplorer() {
             >
               <ResponsiveImage
                 asset={active.asset}
-                sizes="(max-width: 767px) 100vw, 840px"
+                sizes="(max-width: 47.9375rem) 100vw, 52.5rem"
               />
             </m.div>
           </AnimatePresence>

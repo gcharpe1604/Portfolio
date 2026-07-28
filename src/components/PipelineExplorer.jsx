@@ -1,6 +1,6 @@
 import { AnimatePresence, m, useReducedMotion } from "motion/react";
 import { ArrowRight } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { pipelineStages } from "../data/home";
 import { projects } from "../data/site";
@@ -10,7 +10,7 @@ import { ExternalLink } from "./ExternalLink";
 import { MediaDialog } from "./MediaDialog";
 import { ResponsiveImage } from "./ResponsiveImage";
 
-function PipelineEvidence({ stage, compact = false }) {
+function PipelineEvidence({ stage, compact = false, onSettled }) {
   const reduceMotion = useReducedMotion();
 
   return (
@@ -21,7 +21,11 @@ function PipelineEvidence({ stage, compact = false }) {
         initial={reduceMotion ? false : { opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        transition={{
+          duration: reduceMotion ? 0 : 0.2,
+          ease: [0.22, 1, 0.36, 1],
+        }}
+        onAnimationComplete={() => onSettled?.(stage.id)}
       >
         <div className="pipeline-evidence-copy">
           <span className="project-kicker">Selected stage</span>
@@ -48,7 +52,7 @@ function PipelineEvidence({ stage, compact = false }) {
         <figure className="pipeline-media evidence-frame">
           <ResponsiveImage
             asset={stage.asset}
-            sizes="(max-width: 767px) 100vw, 560px"
+            sizes="(max-width: 47.9375rem) 100vw, 35rem"
           />
           <figcaption>
             <span>Real LeadFlow workflow evidence</span>
@@ -67,15 +71,66 @@ function PipelineEvidence({ stage, compact = false }) {
 export function PipelineExplorer() {
   const [activeId, setActiveId] = useState(pipelineStages[0].id);
   const tabsRef = useRef([]);
+  const pendingAlignmentRef = useRef(null);
+  const alignmentTimerRef = useRef(0);
   const trackRef = useRef(null);
   const nodeRefs = useRef(pipelineStages.map(() => ({ current: null })));
   const reduceMotion = useReducedMotion();
-  const isMobile = useMediaQuery("(max-width: 767px)");
+  const isMobile = useMediaQuery("(max-width: 47.9375rem)");
   const activeIndex = pipelineStages.findIndex(
     (stage) => stage.id === activeId,
   );
   const active = pipelineStages[activeIndex];
   const project = projects.leadFlow;
+
+  useEffect(() => () => window.clearTimeout(alignmentTimerRef.current), []);
+
+  const restoreMobileStagePosition = (stageId) => {
+    const pending = pendingAlignmentRef.current;
+    if (!isMobile || pending?.stageId !== stageId) return;
+
+    const stageIndex = pipelineStages.findIndex(
+      (stage) => stage.id === stageId,
+    );
+    const selectedTab = tabsRef.current[stageIndex];
+    if (!selectedTab) return;
+
+    const offset = selectedTab.getBoundingClientRect().top - pending.top;
+    if (Math.abs(offset) > 1) {
+      window.scrollBy({ top: offset, left: 0, behavior: "instant" });
+    }
+
+    pendingAlignmentRef.current = null;
+    window.clearTimeout(alignmentTimerRef.current);
+  };
+
+  const selectStage = (stageId, index, shouldFocus = false) => {
+    if (stageId === activeId) {
+      if (shouldFocus) tabsRef.current[index]?.focus();
+      return;
+    }
+
+    if (isMobile) {
+      if (shouldFocus) tabsRef.current[index]?.focus();
+      const tab = tabsRef.current[index];
+      const headerOffset =
+        document.querySelector(".site-header")?.getBoundingClientRect()
+          .height ?? 0;
+      pendingAlignmentRef.current = {
+        stageId,
+        top: Math.max(tab?.getBoundingClientRect().top ?? 0, headerOffset + 12),
+      };
+      window.clearTimeout(alignmentTimerRef.current);
+      alignmentTimerRef.current = window.setTimeout(
+        () => restoreMobileStagePosition(stageId),
+        reduceMotion ? 0 : 260,
+      );
+    } else if (shouldFocus) {
+      tabsRef.current[index]?.focus();
+    }
+
+    setActiveId(stageId);
+  };
 
   const selectAdjacent = (event, index) => {
     if (
@@ -98,8 +153,7 @@ export function PipelineExplorer() {
     if (event.key === "Home") nextIndex = 0;
     if (event.key === "End") nextIndex = pipelineStages.length - 1;
     nextIndex = (nextIndex + pipelineStages.length) % pipelineStages.length;
-    setActiveId(pipelineStages[nextIndex].id);
-    tabsRef.current[nextIndex]?.focus();
+    selectStage(pipelineStages[nextIndex].id, nextIndex, true);
   };
 
   return (
@@ -168,7 +222,7 @@ export function PipelineExplorer() {
                   isMobile ? `pipeline-panel-${stage.id}` : "pipeline-panel"
                 }
                 tabIndex={activeId === stage.id ? 0 : -1}
-                onClick={() => setActiveId(stage.id)}
+                onClick={() => selectStage(stage.id, index)}
                 onKeyDown={(event) => selectAdjacent(event, index)}
                 data-cursor="Trace"
               >
@@ -194,7 +248,11 @@ export function PipelineExplorer() {
                 }
               >
                 {isMobile && activeId === stage.id ? (
-                  <PipelineEvidence stage={stage} compact />
+                  <PipelineEvidence
+                    stage={stage}
+                    compact
+                    onSettled={restoreMobileStagePosition}
+                  />
                 ) : null}
               </div>
             </div>

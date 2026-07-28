@@ -165,14 +165,14 @@ export const organizations = {
     name: "Harbor CLI",
     repository: "goharbor/harbor-cli",
     intro:
-      "I contribute to Harbor CLI, a Go-based command-line interface in the CNCF Harbor ecosystem, working on command behaviour, error propagation, validation and system-management functionality.",
+      "I contribute to Harbor CLI in the CNCF ecosystem, improving command behaviour, error propagation, validation and system management.",
   },
   musicblocks: {
     id: "musicblocks",
     name: "Music Blocks",
     repository: "sugarlabs/musicblocks",
     intro:
-      "I contributed reliability, performance, interaction and tooling improvements to Music Blocks, a large JavaScript application for learning programming through music.",
+      "I contributed reliability, performance, interaction and tooling improvements to Music Blocks, a JavaScript platform for learning through music.",
   },
 };
 
