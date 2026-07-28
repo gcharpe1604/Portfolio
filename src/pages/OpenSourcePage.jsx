@@ -25,7 +25,7 @@ export default function OpenSourcePage() {
     const next = new URLSearchParams(searchParams);
     if (value === "all") next.delete(key);
     else next.set(key, value);
-    setSearchParams(next, { replace: true });
+    setSearchParams(next);
   };
 
   const filtered = useMemo(
@@ -49,7 +49,14 @@ export default function OpenSourcePage() {
 
   return (
     <div className="open-source-page">
-      <header className="page-hero grid-surface">
+      <header className="page-hero open-source-hero">
+        <span className="page-hero-word" aria-hidden="true">
+          UPSTREAM
+        </span>
+        <div className="page-hero-topline" aria-hidden="true">
+          <span>Contribution ledger</span>
+          <span>Observed work / 2026</span>
+        </div>
         <div className="page-hero-copy">
           <span className="eyebrow">Open-source engineering</span>
           <h1>{openSourceIntro.heading}</h1>
@@ -194,7 +201,7 @@ export default function OpenSourcePage() {
             <button
               type="button"
               className="button button-secondary"
-              onClick={() => setSearchParams({}, { replace: true })}
+              onClick={() => setSearchParams({})}
             >
               Clear filters
             </button>

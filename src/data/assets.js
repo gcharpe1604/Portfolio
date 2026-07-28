@@ -19,9 +19,9 @@ const makeAsset = (name, width, height, alt) => ({
 export const assets = {
   gitAnalyzerDashboard: makeAsset(
     "gitanalyzer-dashboard",
-    1420,
+    1594,
     907,
-    "GitAnalyzer repository report for facebook/react showing a 6.7 out of 10 commit-quality score and repository summary.",
+    "GitAnalyzer product overview explaining how repository history becomes practical engineering feedback.",
   ),
   gitAnalyzerScoring: makeAsset(
     "gitanalyzer-scoring",

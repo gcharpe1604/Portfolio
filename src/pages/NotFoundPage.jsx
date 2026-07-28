@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 export default function NotFoundPage() {
   return (
     <div className="not-found">
+      <span className="not-found-code" aria-hidden="true">
+        404
+      </span>
       <span className="eyebrow">404 · Route not found</span>
       <h1>This path is outside the system.</h1>
       <p>

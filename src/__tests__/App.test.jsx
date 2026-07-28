@@ -33,15 +33,28 @@ describe("portfolio routes and interactions", () => {
     renderAt("/");
 
     expect(
-      await screen.findByRole("heading", {
-        level: 1,
-        name: /I build software products/i,
-      }),
+      await screen.findByRole(
+        "heading",
+        {
+          level: 1,
+          name: /I build software products/i,
+        },
+        { timeout: 5000 },
+      ),
     ).toBeInTheDocument();
     expect(screen.getByText("11")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Selected work" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Skills With evidence" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Open-source Validation" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("link", { name: "View résumé" }).length,
+    ).toBeGreaterThanOrEqual(1);
     expect(
       screen.getByText(
         "OpenTrack — A GitHub-linked contribution-tracking platform currently under development.",
@@ -54,6 +67,7 @@ describe("portfolio routes and interactions", () => {
     expect(
       await screen.findByRole("heading", { level: 1, name: "GitAnalyzer" }),
     ).toBeInTheDocument();
+    expect(document.title).toBe("GitAnalyzer Case Study — Govind Charpe");
     view.unmount();
 
     view = renderAt("/work/leadflow");
@@ -126,16 +140,96 @@ describe("portfolio routes and interactions", () => {
     renderAt("/");
     await screen.findByRole("heading", { level: 1 });
 
-    const detailButton = screen.getByRole("button", {
-      name: /^02\s*Repository-specific recommendations$/,
+    const detailButton = screen.getByRole("tab", {
+      name: /^03\s*Repository-specific recommendations$/,
     });
     await user.click(detailButton);
-    expect(detailButton).toHaveAttribute("aria-pressed", "true");
+    expect(detailButton).toHaveAttribute("aria-selected", "true");
     expect(
-      screen.getByRole("heading", {
-        name: "Repository-specific recommendations",
-      }),
+      await screen.findByText(
+        "Generic advice is weaker than feedback tied to patterns in the repository being analyzed.",
+      ),
     ).toBeInTheDocument();
+  });
+
+  it("supports arrow-key navigation in case-study walkthrough tabs", async () => {
+    const user = userEvent.setup();
+    renderAt("/work/gitanalyzer");
+    await screen.findByRole("heading", { level: 1, name: "GitAnalyzer" });
+
+    const firstTab = screen.getByRole("tab", {
+      name: /^01\s*Explainable scoring$/,
+    });
+    firstTab.focus();
+    await user.keyboard("{End}");
+
+    const lastTab = screen.getByRole("tab", {
+      name: /^03\s*Diff-grounded AI assistance$/,
+    });
+    expect(lastTab).toHaveFocus();
+    expect(lastTab).toHaveAttribute("aria-selected", "true");
+
+    await user.keyboard("{ArrowRight}");
+    expect(firstTab).toHaveFocus();
+    expect(firstTab).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("selects proof, pipeline, and skill evidence with explicit controls", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+
+    const proof = screen.getByRole("button", {
+      name: "Select Harbor CLI proof",
+    });
+    await user.click(proof);
+    expect(proof).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getAllByText("Garbage-collection history command").length,
+    ).toBeGreaterThanOrEqual(1);
+
+    const dispatch = screen.getByRole("tab", { name: /^05\s*Dispatch$/ });
+    await user.click(dispatch);
+    expect(dispatch).toHaveAttribute("aria-selected", "true");
+    expect(
+      await screen.findByText(
+        "An auditable dispatch plan for the selected destination.",
+      ),
+    ).toBeInTheDocument();
+
+    const goSkill = screen.getByRole("button", { name: "Go" });
+    await user.click(goSkill);
+    expect(goSkill).toHaveAttribute("aria-pressed", "true");
+    expect(
+      await screen.findByText("Growing through reviewed open source"),
+    ).toBeInTheDocument();
+
+    const ciSkill = screen.getByRole("button", {
+      name: "CI/CD fundamentals",
+    });
+    await user.click(ciSkill);
+    expect(ciSkill).toHaveAttribute("aria-pressed", "true");
+    const ciHeading = await screen.findByRole(
+      "heading",
+      {
+        level: 3,
+        name: /CI\/CD\s*fundamentals/,
+      },
+      { timeout: 5000 },
+    );
+    expect(ciHeading.querySelector(".skill-heading-line")).toHaveTextContent(
+      "fundamentals",
+    );
+  });
+
+  it("keeps contribution previews focused on status and evidence", async () => {
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+
+    expect(screen.queryByText("Feature")).not.toBeInTheDocument();
+    expect(screen.queryByText("Improvement")).not.toBeInTheDocument();
+    expect(screen.getByText("Merged")).toBeInTheDocument();
+    expect(screen.getByText("Approved · Awaiting merge")).toBeInTheDocument();
   });
 
   it("stores organization and status filters in the URL", async () => {
@@ -167,7 +261,7 @@ describe("portfolio routes and interactions", () => {
     expect(clipboardSpy).toHaveBeenCalledWith("govind.charpe16@gmail.com");
     expect(
       await screen.findByText("Email copied to clipboard.", {
-        selector: ".sr-only",
+        selector: ".copy-status",
       }),
     ).toBeInTheDocument();
   });
@@ -177,10 +271,22 @@ describe("portfolio routes and interactions", () => {
     renderAt("/");
     await screen.findByRole("heading", { level: 1 });
 
-    const trigger = screen.getByRole("button", { name: "View detail" });
+    const trigger = screen.getByRole("button", { name: "Expand evidence" });
     await user.click(trigger);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("open");
+
+    const zoom = within(dialog).getByRole("button", {
+      name: "Zoom evidence image for detail",
+    });
+    await user.click(zoom);
+    expect(zoom).toHaveAttribute("aria-pressed", "true");
+    expect(zoom).toHaveAccessibleName("Fit evidence image to dialog");
+    expect(
+      within(dialog).getByLabelText(
+        "Zoomed evidence image. Scroll horizontally and vertically to inspect details.",
+      ),
+    ).toHaveAttribute("tabindex", "0");
 
     await user.click(
       within(dialog).getByRole("button", {

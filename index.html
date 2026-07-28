@@ -7,7 +7,70 @@
       name="description"
       content="Govind Charpe builds software products and contributes reviewed changes to open-source engineering systems."
     />
-    <meta name="theme-color" content="#0B0D10" />
+    <meta name="author" content="Govind Charpe" />
+    <meta
+      name="robots"
+      content="__ROBOTS_DIRECTIVE__"
+      data-default-content="__ROBOTS_DIRECTIVE__"
+    />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="canonical" href="__SITE_URL__/" />
+    <meta property="og:site_name" content="Govind Charpe — Working Proof" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Govind Charpe — Software Engineer" />
+    <meta
+      property="og:description"
+      content="Software products, open-source contributions, and inspectable engineering evidence from Govind Charpe."
+    />
+    <meta property="og:url" content="__SITE_URL__/" />
+    <meta
+      property="og:image"
+      content="__SITE_URL__/assets/gitanalyzer-dashboard.png"
+    />
+    <meta
+      property="og:image:alt"
+      content="GitAnalyzer product evidence from Govind Charpe's engineering portfolio."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Govind Charpe — Software Engineer" />
+    <meta
+      name="twitter:description"
+      content="Software products, open-source contributions, and inspectable engineering evidence."
+    />
+    <meta
+      name="twitter:image"
+      content="__SITE_URL__/assets/gitanalyzer-dashboard.png"
+    />
+    <meta name="theme-color" content="#191815" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Govind Charpe",
+        "url": "__SITE_URL__/",
+        "jobTitle": "Software Engineering Student",
+        "email": "mailto:govind.charpe16@gmail.com",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Bengaluru",
+          "addressCountry": "IN"
+        },
+        "sameAs": [
+          "https://github.com/gcharpe1604",
+          "https://www.linkedin.com/in/govind-charpe",
+          "https://x.com/g_charpe16"
+        ],
+        "knowsAbout": [
+          "Software engineering",
+          "Open source",
+          "React",
+          "Go",
+          "Cloud-native systems"
+        ]
+      }
+    </script>
     <script>
       (() => {
         const saved = localStorage.getItem("gc-theme");
@@ -18,11 +81,44 @@
             : "dark");
         document.documentElement.dataset.theme = theme;
         document.documentElement.style.colorScheme = theme;
+        document
+          .querySelector('meta[name="theme-color"]')
+          ?.setAttribute("content", theme === "dark" ? "#191815" : "#F3EFE5");
       })();
     </script>
+    <style>
+      .noscript-summary {
+        max-width: 760px;
+        padding: 10vh 24px;
+        margin: auto;
+        font-family: system-ui, sans-serif;
+      }
+      .noscript-summary a {
+        color: inherit;
+      }
+    </style>
     <title>Govind Charpe — Software Engineer</title>
   </head>
   <body>
+    <noscript>
+      <main class="noscript-summary">
+        <h1>Govind Charpe — Software engineering student</h1>
+        <p>
+          I build backend, full-stack, and cloud-native systems. GitAnalyzer is
+          my strongest live product, and my reviewed open-source work includes
+          CNCF Harbor CLI and Sugar Labs Music Blocks.
+        </p>
+        <p>
+          Core tools include JavaScript, TypeScript, React, Go, REST APIs,
+          PostgreSQL, Git, GitHub, and Docker.
+        </p>
+        <p>
+          <a href="/resume.pdf">View résumé PDF</a> ·
+          <a href="mailto:govind.charpe16@gmail.com">Contact me</a> ·
+          <a href="https://github.com/gcharpe1604">GitHub</a>
+        </p>
+      </main>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

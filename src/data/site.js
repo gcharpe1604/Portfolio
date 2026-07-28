@@ -3,6 +3,7 @@ import { assets, musicBlocksVideo } from "./assets";
 export const links = {
   github: "https://github.com/gcharpe1604",
   linkedIn: "https://www.linkedin.com/in/govind-charpe",
+  twitter: "https://x.com/g_charpe16",
   email: "govind.charpe16@gmail.com",
   gitAnalyzerSource: "https://github.com/gcharpe1604/gitanalyzer",
   gitAnalyzerLive: "https://gitanalyzer-ai.netlify.app/",
@@ -17,7 +18,7 @@ export const site = {
   headline:
     "I build software products and contribute to real open-source systems.",
   introduction:
-    "I’m Govind Charpe, a computer science student focused on backend, full-stack and cloud-native engineering. I build developer tools and automation systems, and contribute reviewed improvements to CNCF Harbor CLI and Sugar Labs Music Blocks.",
+    "I’m Govind Charpe, a software engineering student focused on backend, full-stack, and cloud-native systems. I build developer tools and automation, with reviewed contributions to CNCF Harbor CLI and Sugar Labs Music Blocks.",
   availability:
     "Open to software engineering internships and meaningful open-source collaborations.",
   location: "Bengaluru, India · Open to remote opportunities",
@@ -164,14 +165,14 @@ export const organizations = {
     name: "Harbor CLI",
     repository: "goharbor/harbor-cli",
     intro:
-      "I contribute to Harbor CLI, a Go-based command-line interface in the CNCF Harbor ecosystem, working on command behaviour, error propagation, validation and system-management functionality.",
+      "I contribute to Harbor CLI in the CNCF ecosystem, improving command behaviour, error propagation, validation and system management.",
   },
   musicblocks: {
     id: "musicblocks",
     name: "Music Blocks",
     repository: "sugarlabs/musicblocks",
     intro:
-      "I contributed reliability, performance, interaction and tooling improvements to Music Blocks, a large JavaScript application for learning programming through music.",
+      "I contributed reliability, performance, interaction and tooling improvements to Music Blocks, a JavaScript platform for learning through music.",
   },
 };
 
