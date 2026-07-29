@@ -207,7 +207,12 @@ export function Header() {
           aria-label="Govind Charpe, home"
           onClick={returnHome}
         >
-          <span className="brand-mark">{site.monogram}</span>
+          <img
+            className="brand-mark"
+            src="/assets/brand-mark.png"
+            alt=""
+            aria-hidden="true"
+          />
           <span className="brand-name">
             <strong>{site.name}</strong>
           </span>

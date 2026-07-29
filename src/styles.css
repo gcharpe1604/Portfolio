@@ -467,17 +467,12 @@ ol {
 }
 
 .brand-mark {
-  display: grid;
+  display: block;
   width: 2.5rem;
   height: 2.5rem;
   border: 0.09375rem solid var(--ink);
-  background: var(--gold);
-  color: #171512;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 800;
-  place-items: center;
-  transform: rotate(-3deg);
+  background: var(--paper-raised);
+  object-fit: cover;
 }
 
 .brand-name {
