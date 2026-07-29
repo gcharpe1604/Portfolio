@@ -9,9 +9,9 @@
   "theme_color": "#191815",
   "icons": [
     {
-      "src": "/brand-favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/assets/brand-mark.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
       "purpose": "any"
     }
   ]
