@@ -184,7 +184,11 @@ export function Header() {
 
   useEffect(() => {
     const update = () => {
-      setScrolled((current) => window.scrollY > (current ? 24 : 72));
+      // Start after the hero moves 2px beneath the sticky header; keep the
+      // capsule until the page returns to the top to avoid boundary flicker.
+      setScrolled((current) =>
+        current ? window.scrollY > 0 : window.scrollY >= 2,
+      );
       const distance =
         document.documentElement.scrollHeight - window.innerHeight;
       const progress = distance > 0 ? window.scrollY / distance : 0;

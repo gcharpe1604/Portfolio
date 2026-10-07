@@ -35,7 +35,7 @@ afterEach(() => {
 });
 
 describe("portfolio routes and interactions", () => {
-  it("keeps the navbar stable near the scroll boundary without losing focus", async () => {
+  it("converts the navbar after 2px of scrolling without flickering or losing focus", async () => {
     const descriptor = Object.getOwnPropertyDescriptor(window, "scrollY");
     Object.defineProperty(window, "scrollY", {
       configurable: true,
@@ -58,15 +58,19 @@ describe("portfolio routes and interactions", () => {
         fireEvent.scroll(window);
       };
       expect(header).not.toHaveClass("is-scrolled");
-      scroll(60);
+      scroll(1);
       expect(header).not.toHaveClass("is-scrolled");
-      scroll(120);
+      scroll(2);
       expect(header).toHaveClass("is-scrolled");
-      scroll(48);
+      scroll(1.5);
       expect(header).toHaveClass("is-scrolled");
-      scroll(30);
+      scroll(1);
       expect(header).toHaveClass("is-scrolled");
-      scroll(15);
+      scroll(0);
+      expect(header).not.toHaveClass("is-scrolled");
+      scroll(60);
+      expect(header).toHaveClass("is-scrolled");
+      scroll(0);
       expect(header).not.toHaveClass("is-scrolled");
       expect(work).toHaveFocus();
     } finally {
@@ -211,6 +215,33 @@ describe("portfolio routes and interactions", () => {
     expect(
       screen.getByRole("link", { name: "Explore LeadFlow" }),
     ).toHaveAttribute("href", "/work/leadflow");
+  });
+
+  it("reuses hero screenshots during rapid switching and exposes only the final selection", async () => {
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    const panel = screen.getByRole("tabpanel", { name: /01 Product/ });
+    const originalImage = within(panel).getByRole("img");
+    expect(panel.querySelectorAll("img")).toHaveLength(1);
+    const heroTabs = screen.getByRole("tablist", {
+      name: "Explore product, system, and workflow",
+    });
+    fireEvent.pointerEnter(heroTabs.closest(".hero-inspector"));
+    const images = [...panel.querySelectorAll("img")];
+    expect(images).toHaveLength(3);
+    expect(images[0]).toBe(originalImage);
+    const tabs = within(heroTabs).getAllByRole("tab");
+    for (let i = 0; i < 24; i++) fireEvent.click(tabs[(i + 1) % 3]);
+    fireEvent.click(tabs[1]);
+    expect(tabs[1]).toHaveAttribute("aria-selected", "true");
+    expect(panel).toHaveAccessibleName(/02 System/);
+    expect([...panel.querySelectorAll("img")]).toEqual(images);
+    expect(within(panel).getAllByRole("img")).toHaveLength(1);
+    expect(within(panel).getByRole("img")).toBe(images[1]);
+    expect(
+      within(panel).getByRole("link", { name: "Explore Harbor CLI" }),
+    ).toHaveAttribute("href", "/open-source?org=harbor");
+    expect(panel.querySelectorAll("[inert]")).toHaveLength(2);
   });
 
   it("finishes rapid skill-category changes on the final selection", async () => {
@@ -696,9 +727,11 @@ describe("portfolio routes and interactions", () => {
     await screen.findByRole("heading", { level: 1 });
 
     const trigger = screen.getByRole("button", { name: "Expand screenshot" });
+    expect(document.querySelectorAll("dialog img")).toHaveLength(0);
     await user.click(trigger);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("open");
+    expect(within(dialog).getByRole("img")).toBeInTheDocument();
     expect(
       within(dialog).getByRole("group", {
         name: "Evidence image",
@@ -724,6 +757,12 @@ describe("portfolio routes and interactions", () => {
       }),
     );
     expect(dialog).not.toHaveAttribute("open");
+    expect(dialog.querySelector("img")).toBeNull();
+    expect(trigger).toHaveFocus();
+    await user.click(trigger);
+    expect(within(dialog).getByRole("img")).toBeInTheDocument();
+    fireEvent(dialog, new Event("cancel", { cancelable: true }));
+    expect(dialog.querySelector("img")).toBeNull();
     expect(trigger).toHaveFocus();
   });
 

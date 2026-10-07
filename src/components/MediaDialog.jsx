@@ -7,10 +7,12 @@ export function MediaDialog({ asset, label = "Expand image", caption }) {
   const titleId = useId();
   const canvasId = useId();
   const [zoomed, setZoomed] = useState(false);
+  const [opened, setOpened] = useState(false);
 
   const open = () => {
     const dialog = dialogRef.current;
     if (!dialog) return;
+    setOpened(true);
     setZoomed(false);
     if (typeof dialog.showModal === "function") dialog.showModal();
     else dialog.setAttribute("open", "");
@@ -21,6 +23,7 @@ export function MediaDialog({ asset, label = "Expand image", caption }) {
     if (!dialog) return;
     if (typeof dialog.close === "function") dialog.close();
     else dialog.removeAttribute("open");
+    setOpened(false);
     setZoomed(false);
     triggerRef.current?.focus();
   };
@@ -93,16 +96,18 @@ export function MediaDialog({ asset, label = "Expand image", caption }) {
                 : "Evidence image"
             }
           >
-            <ResponsiveImage
-              asset={asset}
-              loading="eager"
-              sizes={
-                zoomed
-                  ? "(max-width: 47.9375rem) 75rem, 96vw"
-                  : "(max-width: 47.9375rem) 96vw, 96vw"
-              }
-              className="dialog-image"
-            />
+            {opened && (
+              <ResponsiveImage
+                asset={asset}
+                loading="eager"
+                sizes={
+                  zoomed
+                    ? "(max-width: 47.9375rem) 75rem, 96vw"
+                    : "(max-width: 47.9375rem) 96vw, 96vw"
+                }
+                className="dialog-image"
+              />
+            )}
           </div>
         </div>
       </dialog>

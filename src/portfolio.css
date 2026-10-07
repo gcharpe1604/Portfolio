@@ -4127,7 +4127,30 @@ body.command-is-open {
   text-decoration: none;
 }
 .inspector-image-transition {
+  position: absolute;
+  inset: 0;
   height: 100%;
+  opacity: 0;
+  transform: translateY(14px) scale(0.975);
+  transition:
+    opacity 550ms var(--ease-out),
+    transform 550ms var(--ease-out);
+}
+.inspector-image-transition[aria-hidden="false"] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.inspector-media.inspector-screenshot {
+  position: relative;
+}
+.inspector-image-transition[aria-hidden="true"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .inspector-image-transition {
+    transition: none;
+  }
 }
 .inspector-back-card {
   border: 1px solid #14181418;
@@ -4169,6 +4192,7 @@ body.command-is-open {
 .inspector-desk-tabs button {
   position: relative;
   z-index: 1;
+  border-radius: inherit;
 }
 .inspector-desk-tabs button[aria-selected="true"] {
   background: transparent;

@@ -9,8 +9,14 @@
   "theme_color": "#191815",
   "icons": [
     {
-      "src": "/assets/brand-mark.png",
-      "sizes": "1254x1254",
+      "src": "/assets/gc-mark-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/gc-mark-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     }

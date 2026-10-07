@@ -16,7 +16,7 @@ export function VideoEvidence({ video }) {
       ) : (
         <video
           controls
-          preload="metadata"
+          preload="none"
           poster={video.poster}
           width={video.width}
           height={video.height}

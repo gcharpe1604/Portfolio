@@ -20,8 +20,10 @@ export function HeroDotBackground() {
     let colors = [];
     let width = 0;
     let height = 0;
+    let pixelRatio = 0;
     let frame = 0;
     let lastTime = 0;
+    let resumeAt = 0;
     let phase = 0;
     let visible = true;
     let dark = false;
@@ -64,6 +66,9 @@ export function HeroDotBackground() {
         Math.sin(phase * 0.31) * width * 0.08 + pointer.x * width * 0.1;
       const driftY =
         Math.cos(phase * 0.23) * height * 0.07 + pointer.y * height * 0.08;
+      // Batch dashes by color and eight depth levels instead of issuing a
+      // separate canvas stroke and style change for every particle.
+      const paths = new Array(colors.length * 8);
       for (const particle of particles) {
         const u = particle.x - driftX;
         const v = particle.y - driftY;
@@ -84,19 +89,34 @@ export function HeroDotBackground() {
         const dx = (Math.cos(angle) * length) / 2;
         const dy = (Math.sin(angle) * length) / 2;
         const hue = (Math.sin(u * 0.0022 - v * 0.0015 + phase * 0.28) + 1) / 2;
-        context.strokeStyle = colors[Math.round(hue * 95)];
+        const bucket = Math.round(hue * 95) * 8 + Math.round(depth * 7);
+        const path = (paths[bucket] ||= new Path2D());
+        path.moveTo(x - dx, y - dy);
+        path.lineTo(x + dx, y + dy);
+      }
+      for (let bucket = 0; bucket < paths.length; bucket++) {
+        if (!paths[bucket]) continue;
+        const depth = (bucket % 8) / 7;
+        context.strokeStyle = colors[Math.floor(bucket / 8)];
         context.globalAlpha = (dark ? 0.24 : 0.2) + depth * 0.45;
-        context.lineWidth = 0.45 + depth * 0.42 + particle.grain * 0.12;
-        context.beginPath();
-        context.moveTo(x - dx, y - dy);
-        context.lineTo(x + dx, y + dy);
-        context.stroke();
+        context.lineWidth = 0.51 + depth * 0.42;
+        context.stroke(paths[bucket]);
       }
       context.globalAlpha = 1;
     };
 
     const tick = (time) => {
       frame = 0;
+      if (time < resumeAt) {
+        start();
+        return;
+      }
+      // The slow ambient field needs fewer updates than the interactive UI.
+      // Keep its drawing work from competing with scrolling and Motion springs.
+      if (lastTime && time - lastTime < 1000 / 30 - 0.5) {
+        start();
+        return;
+      }
       const step = Math.min((time - (lastTime || time)) / 1000, 0.05);
       lastTime = time;
       phase += step;
@@ -133,12 +153,29 @@ export function HeroDotBackground() {
       pointer.targetY = ((event.clientY - box.top) / height - 0.5) * 2;
       start();
     };
+    const prioritizePreview = (event) => {
+      if (
+        !event.target.closest?.(".inspector-desk-tabs, .inspector-back-card") ||
+        (event.type === "keydown" &&
+          !["ArrowLeft", "ArrowRight", "Home", "End", "Enter", " "].includes(
+            event.key,
+          ))
+      )
+        return;
+      // Give the foreground transition the frame budget during a burst of
+      // switches. Resume the field without advancing its phase while paused.
+      resumeAt = performance.now() + 650;
+      lastTime = 0;
+    };
     const resize = () => {
-      stop();
       const box = hero.getBoundingClientRect();
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      if (width === box.width && height === box.height && pixelRatio === ratio)
+        return;
+      stop();
       width = box.width;
       height = box.height;
-      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      pixelRatio = ratio;
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -184,6 +221,8 @@ export function HeroDotBackground() {
     hero.addEventListener("pointermove", move, { passive: true });
     hero.addEventListener("pointerleave", reset);
     hero.addEventListener("pointercancel", reset);
+    hero.addEventListener("click", prioritizePreview, true);
+    hero.addEventListener("keydown", prioritizePreview, true);
     pointerMedia.addEventListener("change", reset);
     document.addEventListener("visibilitychange", visibility);
 
@@ -195,6 +234,8 @@ export function HeroDotBackground() {
       hero.removeEventListener("pointermove", move);
       hero.removeEventListener("pointerleave", reset);
       hero.removeEventListener("pointercancel", reset);
+      hero.removeEventListener("click", prioritizePreview, true);
+      hero.removeEventListener("keydown", prioritizePreview, true);
       pointerMedia.removeEventListener("change", reset);
       document.removeEventListener("visibilitychange", visibility);
       layer.classList.remove("is-ready");

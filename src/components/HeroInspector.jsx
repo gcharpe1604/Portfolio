@@ -46,6 +46,7 @@ const views = [
 
 export function HeroInspector() {
   const [index, setIndex] = useState(0);
+  const [preloadPreviews, setPreloadPreviews] = useState(false);
   const tabs = useRef([]);
   const reducedMotion = useReducedMotion();
   const x = useMotionValue(0);
@@ -76,6 +77,7 @@ export function HeroInspector() {
     reset();
   };
   const selectView = (next) => {
+    setPreloadPreviews(true);
     setIndex(next);
     recenter();
   };
@@ -119,7 +121,11 @@ export function HeroInspector() {
     tabs.current[next]?.focus();
   };
   return (
-    <div className="hero-inspector">
+    <div
+      className="hero-inspector"
+      onPointerEnter={() => setPreloadPreviews(true)}
+      onFocusCapture={() => setPreloadPreviews(true)}
+    >
       <div className="inspector-label">
         <span className="tiny-cross" aria-hidden="true">
           ✳
@@ -227,50 +233,38 @@ export function HeroInspector() {
                   id="inspector-panel"
                   aria-labelledby={`inspector-tab-${index}`}
                 >
-                  <m.div
-                    key={view.title}
-                    className="inspector-image-transition"
-                    initial={
-                      reducedMotion
-                        ? false
-                        : {
-                            opacity: 0,
-                            y: 14,
-                            scale: 0.975,
-                            filter: "blur(5px)",
+                  {views.map((item, i) => {
+                    const active = index === i;
+                    if (!preloadPreviews && !active) return null;
+                    return (
+                      <div
+                        key={item.title}
+                        className="inspector-image-transition"
+                        aria-hidden={!active}
+                        {...(!active ? { inert: "" } : {})}
+                      >
+                        <Link
+                          to={item.href}
+                          aria-label={
+                            i === 0
+                              ? "View GitAnalyzer case study"
+                              : `Explore ${item.title}`
                           }
-                    }
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                      scale: 1,
-                      filter: "blur(0px)",
-                    }}
-                    transition={{
-                      duration: reducedMotion ? 0 : 0.55,
-                      ease: [0.22, 1, 0.36, 1],
-                    }}
-                  >
-                    <Link
-                      to={view.href}
-                      aria-label={
-                        index === 0
-                          ? "View GitAnalyzer case study"
-                          : `Explore ${view.title}`
-                      }
-                    >
-                      <ResponsiveImage
-                        asset={view.asset}
-                        loading="eager"
-                        fetchPriority={index === 0 ? "high" : undefined}
-                        sizes="(max-width: 850px) 92vw, 48vw"
-                      />
-                      <span className="inspector-open">
-                        <ArrowUpRight size={21} aria-hidden="true" /> Explore
-                        the work
-                      </span>
-                    </Link>
-                  </m.div>
+                        >
+                          <ResponsiveImage
+                            asset={item.asset}
+                            loading="eager"
+                            fetchPriority={i === 0 ? "high" : undefined}
+                            sizes="(max-width: 850px) 92vw, 48vw"
+                          />
+                          <span className="inspector-open">
+                            <ArrowUpRight size={21} aria-hidden="true" />{" "}
+                            Explore the work
+                          </span>
+                        </Link>
+                      </div>
+                    );
+                  })}
                 </div>
               </m.div>
             </div>
