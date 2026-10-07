@@ -1,4 +1,5 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useBrowserLayoutEffect } from "../hooks/useBrowserLayoutEffect";
 import {
   AnimatePresence,
   m,
@@ -26,7 +27,7 @@ function SkillRow({
 }) {
   const rowRef = useRef(null);
   const [distance, setDistance] = useState(320);
-  useLayoutEffect(() => {
+  useBrowserLayoutEffect(() => {
     const row = rowRef.current;
     const list = row.closest(".pf-skill-options");
     const measure = () => {
@@ -184,7 +185,7 @@ export function SkillsExplorer() {
   const reducedMotion = useReducedMotion();
   const group = skillGroups[selection.group];
   const skill = group.skills[selection.skill] || group.skills[0];
-  useLayoutEffect(() => {
+  useBrowserLayoutEffect(() => {
     const button = buttons.current[selection.group];
     const container = categoryRef.current;
     let mounted = true;

@@ -1,5 +1,6 @@
 import { m, useReducedMotion } from "motion/react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useBrowserLayoutEffect } from "../hooks/useBrowserLayoutEffect";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { links, site } from "../data/site";
 import { ExternalLink } from "./ExternalLink";
@@ -23,7 +24,7 @@ function NavigationLinks({ activeId, mobile = false, reducedMotion }) {
     ? [...navigation, { id: "resume", label: "View résumé", to: links.resume }]
     : navigation;
 
-  useLayoutEffect(() => {
+  useBrowserLayoutEffect(() => {
     const nav = navRef.current;
     const link = linkRefs.current[activeId];
     let mounted = true;
@@ -95,9 +96,10 @@ function NavigationLinks({ activeId, mobile = false, reducedMotion }) {
 }
 
 function ThemeToggle() {
-  const [theme, setTheme] = useState(
-    () => document.documentElement.dataset.theme || "light",
-  );
+  const [theme, setTheme] = useState("light");
+  useEffect(() => {
+    setTheme(document.documentElement.dataset.theme || "light");
+  }, []);
 
   const toggle = () => {
     const next = theme === "dark" ? "light" : "dark";
@@ -130,9 +132,7 @@ function ThemeToggle() {
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState(
-    () => window.location.hash.slice(1) || "hero",
-  );
+  const [activeSection, setActiveSection] = useState("hero");
   const menuButtonRef = useRef(null);
   const sheetRef = useRef(null);
   const progressRef = useRef(null);

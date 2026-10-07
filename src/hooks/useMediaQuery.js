@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 
 export function useMediaQuery(query) {
-  const [matches, setMatches] = useState(() =>
-    typeof window === "undefined" ? false : window.matchMedia(query).matches,
-  );
+  // Match the static HTML on hydration, then apply the current device preference.
+  const [matches, setMatches] = useState(false);
 
   useEffect(() => {
     const media = window.matchMedia(query);

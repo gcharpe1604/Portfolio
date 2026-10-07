@@ -4,33 +4,13 @@ import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { LazyMotion, domAnimation, m, MotionConfig } from "motion/react";
 
-const routeMetadata = {
-  "/": {
-    title: "Govind Charpe — Software Engineer",
-    description:
-      "Govind Charpe builds software products and contributes reviewed changes to open-source engineering systems.",
-  },
-  "/work/gitanalyzer": {
-    title: "GitAnalyzer Case Study — Govind Charpe",
-    description:
-      "An evidence-led case study of GitAnalyzer, an explainable developer-feedback product for repository history.",
-  },
-  "/work/leadflow": {
-    title: "LeadFlow Case Study — Govind Charpe",
-    description:
-      "An inspectable lead qualification and routing system with explicit policy, failure, and review boundaries.",
-  },
-  "/open-source": {
-    title: "Open-Source Contributions — Govind Charpe",
-    description:
-      "Reviewed contributions to CNCF Harbor CLI and Sugar Labs Music Blocks, with implementation evidence and honest statuses.",
-  },
-  "/resume": {
-    title: "Résumé — Govind Charpe",
-    description:
-      "Govind Charpe's software engineering résumé, projects, open-source experience, and current technical focus.",
-  },
-};
+import {
+  defaultSiteUrl,
+  normalizePath,
+  routeMetadata,
+  notFoundMetadata,
+  structuredData,
+} from "../data/seo";
 
 function setMetaContent(selector, content) {
   document.querySelector(selector)?.setAttribute("content", content);
@@ -40,12 +20,12 @@ export function SiteLayout() {
   const location = useLocation();
 
   useEffect(() => {
-    const knownRouteMetadata = routeMetadata[location.pathname];
-    const metadata = knownRouteMetadata || {
-      title: "Page Not Found — Govind Charpe",
-      description: "The requested portfolio page could not be found.",
-    };
-    const canonicalUrl = `${window.location.origin}${location.pathname}`;
+    const pathname = normalizePath(location.pathname);
+    const knownRouteMetadata = routeMetadata[pathname];
+    const metadata = knownRouteMetadata || notFoundMetadata;
+    const siteUrl = import.meta.env.VITE_SITE_URL || defaultSiteUrl;
+    const canonicalUrl = `${siteUrl}${pathname}`;
+    const imageUrl = `${siteUrl}${metadata.image}`;
     document.title = metadata.title;
     setMetaContent('meta[name="description"]', metadata.description);
     setMetaContent('meta[property="og:title"]', metadata.title);
@@ -53,6 +33,13 @@ export function SiteLayout() {
     setMetaContent('meta[property="og:url"]', canonicalUrl);
     setMetaContent('meta[name="twitter:title"]', metadata.title);
     setMetaContent('meta[name="twitter:description"]', metadata.description);
+    setMetaContent('meta[property="og:image"]', imageUrl);
+    setMetaContent('meta[property="og:image:alt"]', metadata.imageAlt);
+    setMetaContent('meta[name="twitter:image"]', imageUrl);
+    setMetaContent('meta[name="twitter:image:alt"]', metadata.imageAlt);
+    const schema = document.getElementById("page-structured-data");
+    if (schema)
+      schema.textContent = JSON.stringify(structuredData(pathname, siteUrl));
     const robotsMeta = document.querySelector('meta[name="robots"]');
     robotsMeta?.setAttribute(
       "content",

@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useBrowserLayoutEffect } from "../hooks/useBrowserLayoutEffect";
 import {
   AnimatePresence,
   m,
@@ -86,7 +87,7 @@ export function AboutNotebook({ selected, onSelect }) {
   const buttons = useRef([]);
   const tabList = useRef(null);
   const reducedMotion = useReducedMotion();
-  useLayoutEffect(() => {
+  useBrowserLayoutEffect(() => {
     const container = tabList.current;
     const button = buttons.current[selected];
     let mounted = true;

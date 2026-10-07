@@ -7,12 +7,13 @@ import {
   SlidersHorizontal,
   RotateCcw,
 } from "lucide-react";
-import { m, useInView, useReducedMotion } from "motion/react";
+import { m, useInView } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { pipelineStages } from "../data/home";
 import { AnimatedBeam } from "./AnimatedBeam";
 import { PointerSurface } from "./PointerSurface";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 
 const colors = [
   { name: "Coral", value: "#f16b50" },
@@ -31,13 +32,13 @@ export function InterfaceLab() {
   const [running, setRunning] = useState(false);
   const [stepDuration, setStepDuration] = useState(3);
   const [documentVisible, setDocumentVisible] = useState(
-    () => !document.hidden,
+    () => typeof document === "undefined" || !document.hidden,
   );
   const track = useRef(null);
   const nodes = useRef(pipelineStages.map(() => ({ current: null })));
   const buttons = useRef([]);
   const timer = useRef();
-  const reducedMotion = useReducedMotion();
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const visible = useInView(track, { margin: "100px" });
   const active = pipelineStages[stageIndex];
   const advancing =

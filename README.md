@@ -33,7 +33,15 @@ The portfolio focuses on three forms of engineering evidence:
 * **System** — architecture, data flow, reliability boundaries, and implementation decisions
 * **Review** — open-source pull requests, maintainer feedback, revisions, and contribution status
 
-The application is a static React single-page application. It does not require a backend or private API credentials to run.
+The application is a static React portfolio with build-time HTML for the homepage, case studies, open-source work, and résumé. React hydrates these pages for interactive navigation. It does not require a backend or private API credentials to run.
+
+### Search and sharing
+
+`npm run build` generates page-specific HTML, titles, descriptions, canonical URLs, structured data, `robots.txt`, and `sitemap.xml`, plus a `404.html` error page. Metadata lives in `src/data/seo.js`. Set `VITE_SITE_URL` to your permanent public origin when using a custom domain; otherwise the build uses Netlify's `URL` or `https://govind-charpe.netlify.app`. Deploy previews are marked `noindex` and excluded from the sitemap.
+
+The included 1200 × 630 social previews use the existing project screenshots and portfolio identity. Regenerate them with `npm run assets:social` after changing the artwork. They are only referenced by sharing metadata and add no image downloads to normal page visits.
+
+After deploying, submit `/sitemap.xml` in Google Search Console and inspect the homepage and both case-study URLs. Search Console ownership verification and live indexing checks require access to the site owner's account; a successful local build does not prove Google has indexed the site.
 
 ## Featured Engineering Work
 

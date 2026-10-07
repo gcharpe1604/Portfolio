@@ -4,11 +4,13 @@ import {
   render,
   screen,
   within,
+  waitFor,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../App";
+import { seoHead } from "../../scripts/seo.mjs";
 
 function renderAt(path = "/") {
   window.history.pushState({}, "", path);
@@ -35,6 +37,45 @@ afterEach(() => {
 });
 
 describe("portfolio routes and interactions", () => {
+  it("updates canonical, preview and structured data when navigating from a case study", async () => {
+    const previousHead = document.head.innerHTML;
+    try {
+      document.head.innerHTML = seoHead(
+        "/work/leadflow",
+        "https://govind-charpe.netlify.app",
+        "index, follow",
+      );
+      const user = userEvent.setup();
+      renderAt("/work/leadflow");
+      await screen.findByRole("heading", { level: 1, name: "LeadFlow" });
+      expect(
+        document.querySelector('meta[property="og:image"]').content,
+      ).toContain("/social/leadflow.png");
+      await user.click(
+        within(document.querySelector(".pf-site-header")).getByRole("link", {
+          name: "Govind Charpe, home",
+        }),
+      );
+      await screen.findByRole("heading", { level: 1 });
+      await waitFor(() =>
+        expect(document.querySelector('link[rel="canonical"]').href).toBe(
+          "https://govind-charpe.netlify.app/",
+        ),
+      );
+      expect(
+        document.querySelector('meta[property="og:image"]').content,
+      ).toContain("/social/portfolio.png");
+      expect(
+        JSON.parse(document.getElementById("page-structured-data").textContent)[
+          "@graph"
+        ].find((item) => item["@type"] === "ProfilePage").url,
+      ).toBe("https://govind-charpe.netlify.app/");
+    } finally {
+      cleanup();
+      document.head.innerHTML = previousHead;
+    }
+  });
+
   it("converts the navbar after 2px of scrolling without flickering or losing focus", async () => {
     const descriptor = Object.getOwnPropertyDescriptor(window, "scrollY");
     Object.defineProperty(window, "scrollY", {

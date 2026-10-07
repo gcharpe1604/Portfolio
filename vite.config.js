@@ -1,26 +1,19 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { routeMetadata, resolveSiteUrl } from "./src/data/seo.js";
+import { seoHead } from "./scripts/seo.mjs";
 
-const indexableRoutes = [
-  "/",
-  "/work/gitanalyzer",
-  "/work/leadflow",
-  "/open-source",
-  "/resume",
-];
+const indexableRoutes = Object.keys(routeMetadata);
 
 export default defineConfig(() => {
-  const siteUrl = (
-    process.env.URL ||
-    process.env.VITE_SITE_URL ||
-    "https://govind-charpe.netlify.app"
-  ).replace(/\/$/, "");
+  const siteUrl = resolveSiteUrl(process.env);
   const isDeployPreview = process.env.CONTEXT === "deploy-preview";
   const robotsDirective = isDeployPreview
     ? "noindex, nofollow"
     : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 
   return {
+    define: { "import.meta.env.VITE_SITE_URL": JSON.stringify(siteUrl) },
     plugins: [
       react(),
       {
@@ -28,9 +21,10 @@ export default defineConfig(() => {
         transformIndexHtml: {
           order: "pre",
           handler(html) {
-            return html
-              .replaceAll("__SITE_URL__", siteUrl)
-              .replaceAll("__ROBOTS_DIRECTIVE__", robotsDirective);
+            return html.replace(
+              "__SEO_HEAD__",
+              seoHead("/", siteUrl, robotsDirective),
+            );
           },
         },
         generateBundle() {
