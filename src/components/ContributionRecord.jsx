@@ -33,7 +33,12 @@ export function ContributionRecord({ contribution, compact = false }) {
             <li key={technology}>{technology}</li>
           ))}
         </ul>
-        <ExternalLink href={contribution.link}>View pull request</ExternalLink>
+        <ExternalLink
+          href={contribution.link}
+          label={`View ${contribution.organization === "harbor" ? "Harbor CLI" : "Music Blocks"} pull request #${contribution.number} on GitHub`}
+        >
+          View pull request
+        </ExternalLink>
       </div>
       {!compact && contribution.asset ? (
         <figure className="evidence-figure">

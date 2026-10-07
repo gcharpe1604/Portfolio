@@ -1,4 +1,3 @@
-import { ArrowRight } from "lucide-react";
 import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ContributionRecord } from "../components/ContributionRecord";
@@ -59,7 +58,11 @@ export default function OpenSourcePage() {
         </div>
         <div className="page-hero-copy">
           <span className="eyebrow">Open-source engineering</span>
-          <h1>{openSourceIntro.heading}</h1>
+          <h1>
+            Engineering in codebases
+            <br />
+            <em>I didn’t design.</em>
+          </h1>
           <p>{openSourceIntro.copy}</p>
         </div>
         <dl className="page-proof-stats">
@@ -130,7 +133,7 @@ export default function OpenSourcePage() {
             target="_blank"
             rel="noreferrer"
           >
-            Follow the current PR <ArrowRight aria-hidden="true" />
+            Follow the current PR
           </a>
         </div>
         <ol className="revision-timeline">
@@ -210,9 +213,7 @@ export default function OpenSourcePage() {
       </section>
 
       <div className="page-next-link">
-        <Link to="/#contact">
-          Discuss open-source collaboration <ArrowRight aria-hidden="true" />
-        </Link>
+        <Link to="/#contact">Discuss open-source collaboration</Link>
       </div>
     </div>
   );

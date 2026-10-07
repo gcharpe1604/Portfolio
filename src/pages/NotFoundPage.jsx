@@ -1,10 +1,9 @@
-import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function NotFoundPage() {
   return (
     <div className="not-found">
-      <span className="not-found-code" aria-hidden="true">
+      <span className="not-found-word" aria-hidden="true">
         404
       </span>
       <span className="eyebrow">404 · Route not found</span>
@@ -14,7 +13,6 @@ export default function NotFoundPage() {
         work and contribution log are available from the homepage.
       </p>
       <Link className="button button-primary" to="/">
-        <ArrowLeft aria-hidden="true" />
         Return home
       </Link>
     </div>

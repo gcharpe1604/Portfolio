@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -41,7 +41,7 @@
       name="twitter:image"
       content="__SITE_URL__/assets/gitanalyzer-dashboard.png"
     />
-    <meta name="theme-color" content="#191815" />
+    <meta name="theme-color" content="#f3efe5" />
     <link rel="icon" href="/assets/brand-mark.png" type="image/png" />
     <link rel="manifest" href="/site.webmanifest" />
     <script type="application/ld+json">
@@ -74,16 +74,12 @@
     <script>
       (() => {
         const saved = localStorage.getItem("gc-theme");
-        const theme =
-          saved ||
-          (window.matchMedia("(prefers-color-scheme: light)").matches
-            ? "light"
-            : "dark");
+        const theme = saved === "dark" || saved === "light" ? saved : "light";
         document.documentElement.dataset.theme = theme;
         document.documentElement.style.colorScheme = theme;
         document
           .querySelector('meta[name="theme-color"]')
-          ?.setAttribute("content", theme === "dark" ? "#191815" : "#F3EFE5");
+          ?.setAttribute("content", theme === "dark" ? "#191e19" : "#f3efe5");
       })();
     </script>
     <style>

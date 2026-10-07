@@ -1,85 +1,70 @@
-import { Download, Maximize2, Minimize2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight, Download } from "lucide-react";
+import { about } from "../data/site";
 
 export default function ResumePage() {
-  const viewerRef = useRef(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  useEffect(() => {
-    const updateFullscreenState = () => {
-      setIsFullscreen(document.fullscreenElement === viewerRef.current);
-    };
-    document.addEventListener("fullscreenchange", updateFullscreenState);
-    return () =>
-      document.removeEventListener("fullscreenchange", updateFullscreenState);
-  }, []);
-
-  const toggleFullscreen = async () => {
-    if (document.fullscreenElement) {
-      await document.exitFullscreen();
-      return;
-    }
-
-    if (viewerRef.current?.requestFullscreen) {
-      await viewerRef.current.requestFullscreen();
-      return;
-    }
-
-    window.open("/resume.pdf", "_blank", "noopener,noreferrer");
-  };
-
   return (
-    <div className="resume-page">
-      <div className="resume-layout">
-        <header>
-          <span className="resume-page-word" aria-hidden="true">
-            CV
-          </span>
-          <span className="eyebrow">Résumé</span>
-          <h1 aria-label="Govind Charpe">
-            <span aria-hidden="true">Govind</span>
-            <span aria-hidden="true">Charpe</span>
-          </h1>
-          <p>
-            A one-page résumé covering projects, open-source experience, and
-            current engineering focus.
-          </p>
+    <section className="pf-resume pf-wrap">
+      <header>
+        <span className="pf-kicker">Background / Résumé</span>
+        <h1>
+          Govind
+          <br />
+          <em>Charpe.</em>
+        </h1>
+        <p>Projects, open-source contributions, and education in one place.</p>
+        <div>
           <a
-            className="button button-primary"
+            className="pf-button"
             href="/resume.pdf"
             download="Govind-Charpe-Resume.pdf"
           >
-            <Download aria-hidden="true" />
-            Download PDF
+            Download PDF <Download size={16} aria-hidden="true" />
           </a>
-        </header>
-
-        <section
-          ref={viewerRef}
-          className="resume-viewer"
-          aria-label="Résumé PDF viewer"
-        >
-          <div className="resume-viewer-toolbar">
-            <span>Résumé preview</span>
-            <button type="button" onClick={toggleFullscreen}>
-              {isFullscreen ? (
-                <Minimize2 aria-hidden="true" />
-              ) : (
-                <Maximize2 aria-hidden="true" />
-              )}
-              {isFullscreen ? "Exit full screen" : "Full screen"}
-            </button>
+          <a
+            className="pf-link"
+            href="/resume.pdf"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open PDF <ArrowUpRight size={16} aria-hidden="true" />
+          </a>
+        </div>
+        <section className="resume-notes" aria-label="Background at a glance">
+          <div>
+            <h2>Education</h2>
+            {about.education.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
           </div>
-          <iframe src="/resume.pdf#view=FitH" title="Govind Charpe résumé" />
-          <p>
-            If the PDF viewer is unavailable,{" "}
-            <a href="/resume.pdf" target="_blank" rel="noreferrer">
-              open the résumé in a new tab
-            </a>
-            .
-          </p>
+          <div>
+            <h2>Selected work</h2>
+            <p>GitAnalyzer · LeadFlow</p>
+            <p>Open-source contributions to Harbor CLI and Music Blocks.</p>
+          </div>
+          <div>
+            <h2>Currently exploring</h2>
+            <p>Backend fundamentals, databases, and AI agent debugging.</p>
+          </div>
         </section>
-      </div>
-    </div>
+      </header>
+      <figure className="resume-document">
+        <div>
+          <span>GOVIND CHARPE / RÉSUMÉ</span>
+          <span>PDF DOCUMENT ↗</span>
+        </div>
+        <img
+          src="/resume-preview.png"
+          alt="Preview of Govind Charpe’s résumé"
+          width="1191"
+          height="1684"
+        />
+        <figcaption>
+          Prefer the original document?{" "}
+          <a href="/resume.pdf" target="_blank" rel="noreferrer">
+            Open the PDF.
+          </a>
+        </figcaption>
+      </figure>
+    </section>
   );
 }

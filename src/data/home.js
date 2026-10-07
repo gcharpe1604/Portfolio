@@ -240,8 +240,8 @@ export const skillGroups = [
       ),
       skill(
         "PostgreSQL",
-        "Used through Supabase for GitAnalyzer history and in OpenTrack architecture and development work.",
-        "Applied; OpenTrack remains under development",
+        "Used through Supabase for GitAnalyzer history and in earlier OpenTrack development work.",
+        "Applied; OpenTrack is currently on hold",
         projects.gitAnalyzer.links.caseStudy,
       ),
       skill(

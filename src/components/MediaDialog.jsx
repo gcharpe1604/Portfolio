@@ -1,4 +1,3 @@
-import { Expand, Minimize2, X, ZoomIn } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { ResponsiveImage } from "./ResponsiveImage";
 
@@ -43,7 +42,6 @@ export function MediaDialog({ asset, label = "Expand image", caption }) {
         type="button"
         onClick={open}
       >
-        <Expand size={17} aria-hidden="true" />
         <span>{label}</span>
       </button>
       <dialog
@@ -71,11 +69,6 @@ export function MediaDialog({ asset, label = "Expand image", caption }) {
                 }
                 onClick={() => setZoomed((current) => !current)}
               >
-                {zoomed ? (
-                  <Minimize2 aria-hidden="true" />
-                ) : (
-                  <ZoomIn aria-hidden="true" />
-                )}
                 <span>{zoomed ? "Fit" : "Zoom"}</span>
               </button>
               <button
@@ -84,19 +77,20 @@ export function MediaDialog({ asset, label = "Expand image", caption }) {
                 onClick={close}
                 aria-label="Close expanded image"
               >
-                <X aria-hidden="true" />
+                Close
               </button>
             </div>
           </div>
           <div
             id={canvasId}
+            role="group"
             className={`media-dialog-canvas${zoomed ? " is-zoomed" : ""}`}
             style={{ "--dialog-image-width": `${asset.width / 16}rem` }}
             tabIndex={zoomed ? 0 : -1}
             aria-label={
               zoomed
                 ? "Zoomed evidence image. Scroll horizontally and vertically to inspect details."
-                : undefined
+                : "Evidence image"
             }
           >
             <ResponsiveImage

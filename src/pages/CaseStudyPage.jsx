@@ -1,4 +1,3 @@
-import { Check, Copy, ExternalLink as ExternalIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArchitectureDiagram } from "../components/ArchitectureDiagram";
@@ -7,32 +6,43 @@ import { LeadFlowDiagram } from "../components/LeadFlowDiagram";
 import { MediaDialog } from "../components/MediaDialog";
 import { ResponsiveImage } from "../components/ResponsiveImage";
 import { StatusBadge } from "../components/StatusBadge";
+import { PointerSurface } from "../components/PointerSurface";
 import { caseStudies } from "../data/caseStudies";
+import { ArrowUpRight } from "lucide-react";
 
 function CopySectionLink({ id }) {
-  const [copied, setCopied] = useState(false);
+  const [message, setMessage] = useState("");
+  const timer = useRef();
+  useEffect(() => () => window.clearTimeout(timer.current), []);
 
   const copy = async () => {
     const url = `${window.location.origin}${window.location.pathname}#${id}`;
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+    window.clearTimeout(timer.current);
+    try {
+      await navigator.clipboard.writeText(url);
+      setMessage("Copied");
+    } catch {
+      setMessage(
+        "Copy unavailable. Use this section’s link in the page index.",
+      );
+    }
+    timer.current = window.setTimeout(() => setMessage(""), 3000);
   };
 
   return (
-    <button
-      type="button"
-      className="copy-section-link"
-      onClick={copy}
-      aria-label={`Copy link to ${id} section`}
-    >
-      {copied ? (
-        <Check size={16} aria-hidden="true" />
-      ) : (
-        <Copy size={16} aria-hidden="true" />
-      )}
-      <span>{copied ? "Copied" : "Copy link"}</span>
-    </button>
+    <>
+      <button
+        type="button"
+        className="copy-section-link"
+        onClick={copy}
+        aria-label={`Copy link to ${id} section`}
+      >
+        <span>{message === "Copied" ? "Copied" : "Copy link"}</span>
+      </button>
+      <span className="sr-only" role="status">
+        {message}
+      </span>
+    </>
   );
 }
 
@@ -291,7 +301,10 @@ export default function CaseStudyPage() {
     : "live";
 
   return (
-    <article className={`case-study-page case-${projectSlug}`}>
+    <article
+      className={`case-study-page case-${projectSlug}`}
+      key={projectSlug}
+    >
       <header className="case-hero">
         <span className="case-hero-word" aria-hidden="true">
           {study.title}
@@ -332,7 +345,7 @@ export default function CaseStudyPage() {
                 ))}
             </div>
           </div>
-          <div className="case-hero-media">
+          <PointerSurface className="case-hero-media">
             <ResponsiveImage
               asset={study.heroAsset}
               loading="eager"
@@ -344,7 +357,7 @@ export default function CaseStudyPage() {
               label="Expand hero evidence"
               caption={`${study.title} overview`}
             />
-          </div>
+          </PointerSurface>
         </div>
       </header>
 
@@ -402,8 +415,24 @@ export default function CaseStudyPage() {
               ? "Deterministic analysis remains separate from optional AI assistance."
               : "A routing plan is not evidence of successful external delivery."}
           </p>
-          <ExternalIcon aria-hidden="true" />
         </aside>
+      </div>
+      <div className="case-next">
+        <div className="pf-wrap">
+          <div>
+            <span className="pf-kicker">Keep exploring / Next case study</span>
+            <h2>
+              {projectSlug === "gitanalyzer" ? "LeadFlow" : "GitAnalyzer"}
+            </h2>
+          </div>
+          <Link
+            className="pf-button"
+            to={`/work/${projectSlug === "gitanalyzer" ? "leadflow" : "gitanalyzer"}`}
+          >
+            Explore the next project{" "}
+            <ArrowUpRight size={18} aria-hidden="true" />
+          </Link>
+        </div>
       </div>
     </article>
   );

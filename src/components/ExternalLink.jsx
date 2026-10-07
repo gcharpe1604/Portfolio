@@ -5,7 +5,7 @@ export function ExternalLink({
   children,
   className = "",
   label,
-  showIndicator = true,
+  showIndicator = false,
   ...props
 }) {
   return (

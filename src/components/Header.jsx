@@ -1,21 +1,102 @@
-import { Github, Menu, Moon, Sun, X } from "lucide-react";
-import { useReducedMotion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { m, useReducedMotion } from "motion/react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { links, site } from "../data/site";
 import { ExternalLink } from "./ExternalLink";
+import { QuickNavigation } from "./QuickNavigation";
+import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
 
 const navigation = [
   { id: "work", label: "Work", to: "/#work" },
-  { id: "skills", label: "Skills", to: "/#skills" },
   { id: "open-source", label: "Open Source", to: "/#open-source" },
+  { id: "lab", label: "Lab", to: "/#lab" },
+  { id: "skills", label: "Skills", to: "/#skills" },
   { id: "about", label: "About", to: "/#about" },
   { id: "contact", label: "Contact", to: "/#contact" },
 ];
 
+function NavigationLinks({ activeId, mobile = false, reducedMotion }) {
+  const navRef = useRef(null);
+  const linkRefs = useRef({});
+  const [indicator, setIndicator] = useState(null);
+  const items = mobile
+    ? [...navigation, { id: "resume", label: "View résumé", to: links.resume }]
+    : navigation;
+
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    const link = linkRefs.current[activeId];
+    let mounted = true;
+    const measure = () => {
+      if (!mounted) return;
+      const navBox = nav.getBoundingClientRect();
+      const linkBox = link?.getBoundingClientRect();
+      setIndicator(
+        linkBox?.width
+          ? {
+              x: linkBox.left - navBox.left,
+              y: linkBox.top - navBox.top,
+              width: linkBox.width,
+              height: linkBox.height,
+            }
+          : null,
+      );
+    };
+    measure();
+    document.fonts?.ready.then(measure);
+    window.addEventListener("resize", measure);
+    const observer =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(measure)
+        : null;
+    observer?.observe(nav);
+    if (link) observer?.observe(link);
+    return () => {
+      mounted = false;
+      observer?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [activeId]);
+
+  return (
+    <nav
+      ref={navRef}
+      className={mobile ? "pf-mobile-nav" : "pf-desktop-nav"}
+      aria-label={mobile ? "Mobile navigation" : "Primary navigation"}
+    >
+      {indicator && (
+        <m.div
+          className="pf-nav-indicator"
+          aria-hidden="true"
+          initial={false}
+          animate={indicator}
+          transition={
+            reducedMotion
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 350, damping: 32 }
+          }
+        />
+      )}
+      {items.map((item) => (
+        <Link
+          key={item.id}
+          ref={(link) => {
+            linkRefs.current[item.id] = link;
+          }}
+          to={item.to}
+          className={`nav-link${activeId === item.id ? " is-active" : ""}`}
+          aria-current={activeId === item.id ? "page" : undefined}
+        >
+          {item.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
 function ThemeToggle() {
   const [theme, setTheme] = useState(
-    () => document.documentElement.dataset.theme || "dark",
+    () => document.documentElement.dataset.theme || "light",
   );
 
   const toggle = () => {
@@ -24,7 +105,7 @@ function ThemeToggle() {
     document.documentElement.style.colorScheme = next;
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", next === "dark" ? "#191815" : "#F3EFE5");
+      ?.setAttribute("content", next === "dark" ? "#191e19" : "#f3efe5");
     localStorage.setItem("gc-theme", next);
     setTheme(next);
   };
@@ -38,9 +119,9 @@ function ThemeToggle() {
       title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
     >
       {theme === "dark" ? (
-        <Sun aria-hidden="true" />
+        <Sun size={18} aria-hidden="true" />
       ) : (
-        <Moon aria-hidden="true" />
+        <Moon size={18} aria-hidden="true" />
       )}
     </button>
   );
@@ -97,10 +178,13 @@ export function Header() {
     }
     return location.pathname === "/" && activeSection === item.id;
   };
+  const activeNavId =
+    navigation.find(isActive)?.id ||
+    (location.pathname === "/resume" ? "resume" : null);
 
   useEffect(() => {
     const update = () => {
-      setScrolled(window.scrollY > 48);
+      setScrolled((current) => window.scrollY > (current ? 24 : 72));
       const distance =
         document.documentElement.scrollHeight - window.innerHeight;
       const progress = distance > 0 ? window.scrollY / distance : 0;
@@ -119,8 +203,9 @@ export function Header() {
     const sectionIds = [
       "hero",
       "work",
-      "skills",
       "open-source",
+      "lab",
+      "skills",
       "about",
       "contact",
     ];
@@ -194,47 +279,30 @@ export function Header() {
   }, [menuOpen]);
 
   return (
-    <header className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
+    <header className={`pf-site-header ${scrolled ? "is-scrolled" : ""}`}>
       <span
         ref={progressRef}
         className="site-scroll-progress"
         aria-hidden="true"
       />
-      <div className="header-inner">
+      <div className="pf-header-inner">
         <Link
-          className="brand"
+          className="pf-brand"
           to="/"
           aria-label="Govind Charpe, home"
           onClick={returnHome}
         >
-          <img
-            className="brand-mark"
-            src="/assets/brand-mark.png"
-            alt=""
-            aria-hidden="true"
-          />
-          <span className="brand-name">
-            <strong>{site.name}</strong>
+          <span className="pf-brand-mark" aria-hidden="true">
+            gc<span>.</span>
           </span>
+          <span className="pf-brand-name">{site.name}</span>
         </Link>
 
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          {navigation.map((item, index) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              className={isActive(item) ? "nav-link is-active" : "nav-link"}
-              aria-current={isActive(item) ? "page" : undefined}
-            >
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <NavigationLinks activeId={activeNavId} reducedMotion={reduceMotion} />
 
-        <div className="header-actions">
-          <Link className="header-resume-link" to={links.resume}>
-            View résumé
+        <div className="pf-header-actions">
+          <Link className="pf-header-resume" to={links.resume}>
+            Résumé <ArrowUpRight size={15} aria-hidden="true" />
           </Link>
           <ExternalLink
             className="icon-link"
@@ -242,10 +310,10 @@ export function Header() {
             label="Open Govind Charpe’s GitHub profile in a new tab"
             showIndicator={false}
           >
-            <Github aria-hidden="true" />
-            <span className="sr-only">GitHub</span>
+            GitHub
           </ExternalLink>
           <ThemeToggle />
+          <QuickNavigation />
           <button
             ref={menuButtonRef}
             className="icon-button mobile-menu-button"
@@ -255,14 +323,14 @@ export function Header() {
             aria-controls="mobile-menu"
             onClick={() => setMenuOpen(true)}
           >
-            <Menu aria-hidden="true" />
+            <Menu size={21} aria-hidden="true" />
           </button>
         </div>
       </div>
 
       {menuOpen ? (
         <div
-          className="sheet-backdrop"
+          className="pf-sheet-backdrop"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               setMenuOpen(false);
@@ -272,13 +340,13 @@ export function Header() {
         >
           <div
             ref={sheetRef}
-            className="mobile-sheet"
+            className="pf-mobile-sheet"
             id="mobile-menu"
             role="dialog"
             aria-modal="true"
             aria-label="Mobile navigation"
           >
-            <div className="mobile-sheet-header">
+            <div className="pf-mobile-sheet-header">
               <span className="eyebrow">Navigation</span>
               <button
                 className="icon-button"
@@ -289,27 +357,15 @@ export function Header() {
                 }}
                 aria-label="Close navigation menu"
               >
-                <X aria-hidden="true" />
+                <X size={20} aria-hidden="true" />
               </button>
             </div>
-            <nav aria-label="Mobile navigation">
-              {navigation.map((item, index) => (
-                <Link
-                  key={item.label}
-                  to={item.to}
-                  className={isActive(item) ? "is-active" : undefined}
-                  aria-current={isActive(item) ? "page" : undefined}
-                >
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  {item.label}
-                </Link>
-              ))}
-              <Link to={links.resume}>
-                <span>06</span>
-                View résumé
-              </Link>
-            </nav>
-            <div className="mobile-sheet-meta">
+            <NavigationLinks
+              activeId={activeNavId}
+              mobile
+              reducedMotion={reduceMotion}
+            />
+            <div className="pf-mobile-sheet-meta">
               <p>{site.availability}</p>
               <a href={`mailto:${links.email}`}>{links.email}</a>
             </div>
