@@ -10,10 +10,11 @@ const indexableRoutes = [
 ];
 
 export default defineConfig(() => {
-  const siteUrl = (process.env.URL || process.env.VITE_SITE_URL || "").replace(
-    /\/$/,
-    "",
-  );
+  const siteUrl = (
+    process.env.URL ||
+    process.env.VITE_SITE_URL ||
+    "https://govind-charpe.netlify.app"
+  ).replace(/\/$/, "");
   const isDeployPreview = process.env.CONTEXT === "deploy-preview";
   const robotsDirective = isDeployPreview
     ? "noindex, nofollow"

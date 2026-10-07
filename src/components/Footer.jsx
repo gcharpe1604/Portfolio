@@ -1,21 +1,13 @@
 import { Link } from "react-router-dom";
-import { links } from "../data/site";
-import { ExternalLink } from "./ExternalLink";
-
 export function Footer() {
   return (
-    <footer className="site-footer">
-      <div className="footer-inner">
-        <div>
-          <p>Designed and built by Govind Charpe.</p>
-          <p>Built with React and Vite. Source available on GitHub.</p>
-        </div>
-        <nav aria-label="Footer navigation">
-          <ExternalLink href={links.github}>GitHub</ExternalLink>
-          <ExternalLink href={links.linkedIn}>LinkedIn</ExternalLink>
-          <Link to={links.resume}>Résumé</Link>
-        </nav>
-        <p>© {new Date().getFullYear()} Govind Charpe</p>
+    <footer className="pf-footer">
+      <div className="pf-wrap">
+        <Link to="/" aria-label="Govind Charpe, home">
+          Govind Charpe
+        </Link>
+        <p>Software engineering student</p>
+        <span>© {new Date().getFullYear()}</span>
       </div>
     </footer>
   );

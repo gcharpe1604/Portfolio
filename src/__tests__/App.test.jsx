@@ -1,4 +1,10 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -29,37 +35,412 @@ afterEach(() => {
 });
 
 describe("portfolio routes and interactions", () => {
-  it("renders the homepage hierarchy and verified proof data", async () => {
-    renderAt("/");
+  it("keeps the navbar stable near the scroll boundary without losing focus", async () => {
+    const descriptor = Object.getOwnPropertyDescriptor(window, "scrollY");
+    Object.defineProperty(window, "scrollY", {
+      configurable: true,
+      value: 0,
+      writable: true,
+    });
+    try {
+      renderAt("/");
+      await screen.findByRole("heading", { level: 1 }, { timeout: 3000 });
+      const header = screen
+        .getByRole("navigation", { name: "Primary navigation" })
+        .closest("header");
+      const work = within(header).getByRole("link", {
+        name: "Work",
+        exact: true,
+      });
+      work.focus();
+      const scroll = (position) => {
+        window.scrollY = position;
+        fireEvent.scroll(window);
+      };
+      expect(header).not.toHaveClass("is-scrolled");
+      scroll(60);
+      expect(header).not.toHaveClass("is-scrolled");
+      scroll(120);
+      expect(header).toHaveClass("is-scrolled");
+      scroll(48);
+      expect(header).toHaveClass("is-scrolled");
+      scroll(30);
+      expect(header).toHaveClass("is-scrolled");
+      scroll(15);
+      expect(header).not.toHaveClass("is-scrolled");
+      expect(work).toHaveFocus();
+    } finally {
+      Object.defineProperty(window, "scrollY", descriptor);
+    }
+  });
 
+  it("searches quick navigation and opens the selected project", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 }, { timeout: 3000 });
+    await user.click(
+      screen.getByRole("button", { name: "Open quick navigation" }),
+    );
+    const search = screen.getByRole("combobox", {
+      name: "Search pages and sections",
+    });
+    expect(search).toHaveFocus();
+    await user.type(search, "workflow");
+    expect(screen.getByRole("option", { name: /LeadFlow/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await user.keyboard("{Enter}");
+    expect(window.location.pathname).toBe("/work/leadflow");
     expect(
       await screen.findByRole(
         "heading",
-        {
-          level: 1,
-          name: /I build software products/i,
-        },
-        { timeout: 5000 },
+        { name: "LeadFlow", level: 1 },
+        { timeout: 3000 },
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText("11")).toBeInTheDocument();
+    expect(window.location.pathname).toBe("/work/leadflow");
+    expect(document.body).not.toHaveClass("command-is-open");
+  });
+
+  it("recovers from an empty quick-navigation search and restores focus", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    const trigger = screen.getByRole("button", {
+      name: "Open quick navigation",
+    });
+    await user.click(trigger);
+    await user.type(screen.getByRole("combobox"), "unknown-destination");
+    expect(screen.queryByRole("option")).not.toBeInTheDocument();
+    expect(screen.getByText(/Nothing matches yet/)).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "Close quick navigation" }),
+    );
+    expect(trigger).toHaveFocus();
+  });
+
+  it("explores background notes with the keyboard", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    screen.getByRole("tab", { name: "Now", exact: true }).focus();
+    await user.keyboard("{End}");
     expect(
-      screen.getByRole("heading", { name: "Selected work" }),
-    ).toBeInTheDocument();
+      screen.getByRole("tab", { name: "Background", exact: true }),
+    ).toHaveFocus();
     expect(
-      screen.getByRole("heading", { name: "Skills With evidence" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "Open-source Validation" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getAllByRole("link", { name: "View résumé" }).length,
-    ).toBeGreaterThanOrEqual(1);
-    expect(
-      screen.getByText(
-        "OpenTrack — A GitHub-linked contribution-tracking platform currently under development.",
+      await screen.findByText(
+        "Polaris School of Technology / Medhavi Skills University",
       ),
     ).toBeInTheDocument();
+    await user.keyboard("{ArrowLeft}");
+    expect(
+      await screen.findByRole("heading", {
+        name: "Build. Read. Review. Repeat.",
+      }),
+    ).toBeInTheDocument();
+    await user.keyboard("{Home}");
+    expect(
+      await screen.findByRole("heading", { name: /AI Agent Execution/ }),
+    ).toBeInTheDocument();
+  });
+
+  it("flips the personal card and keeps its note connected to the notebook", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    const flip = await screen.findByRole("button", {
+      name: "Explore my story",
+    });
+    expect(flip).toHaveAttribute("aria-expanded", "false");
+    expect(
+      screen.queryByRole("heading", { name: "Learning by building." }),
+    ).not.toBeInTheDocument();
+    flip.focus();
+    await user.keyboard("{Enter}");
+    expect(flip).toHaveAttribute("aria-expanded", "true");
+    expect(
+      screen.getByRole("heading", { name: "Learning by building." }),
+    ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("tab", { name: "Approach", exact: true }),
+    );
+    expect(
+      await screen.findByRole("heading", { name: "Learn from real code." }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", {
+        name: "Build. Read. Review. Repeat.",
+      }),
+    ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("tab", { name: "Background", exact: true }),
+    );
+    expect(
+      await screen.findByRole("heading", { name: "A work in progress." }),
+    ).toBeInTheDocument();
+    const back = screen.getByRole("button", { name: "Back to card" });
+    back.focus();
+    await user.keyboard("{Escape}");
+    expect(back).toHaveFocus();
+    expect(back).toHaveAttribute("aria-expanded", "false");
+    expect(
+      screen.queryByRole("heading", { name: "A work in progress." }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("tab", { name: "Background", exact: true }),
+    ).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("explores real hero evidence with keyboard navigation", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    const product = screen.getByRole("tab", { name: /01 Product/ });
+    product.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("tab", { name: /02 System/ })).toHaveFocus();
+    expect(
+      screen.getByRole("link", { name: "Explore Harbor CLI" }),
+    ).toHaveAttribute("href", "/open-source?org=harbor");
+    await user.keyboard("{End}");
+    expect(screen.getByRole("tab", { name: /03 Workflow/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(
+      screen.getByRole("link", { name: "Explore LeadFlow" }),
+    ).toHaveAttribute("href", "/work/leadflow");
+  });
+
+  it("finishes rapid skill-category changes on the final selection", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(
+      screen.getByRole("button", { name: "Frontend", exact: true }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Tools and Cloud", exact: true }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Backend and Data", exact: true }),
+    );
+    const frontend = screen.getByRole("button", {
+      name: "Frontend",
+      exact: true,
+    });
+    await user.click(frontend);
+    expect(frontend).toHaveAttribute("aria-pressed", "true");
+    expect(
+      await screen.findByRole(
+        "button",
+        { name: "React", exact: true },
+        { timeout: 2500 },
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "React", level: 3 }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Go", exact: true }),
+    ).not.toBeInTheDocument();
+    frontend.focus();
+    await user.keyboard("{Home}");
+    expect(
+      screen.getByRole("button", { name: "Languages", exact: true }),
+    ).toHaveFocus();
+    expect(
+      await screen.findByRole(
+        "button",
+        { name: "JavaScript", exact: true },
+        { timeout: 2500 },
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("opens the original screenshot from a clickable workbench card", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(
+      screen.getByRole("button", { name: "Bring Harbor CLI to front" }),
+    );
+    expect(screen.getByRole("tab", { name: /02 System/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Inspect image", exact: true }),
+    );
+    const dialog = screen.getByRole("dialog", {
+      name: "Harbor CLI / original project screenshot",
+    });
+    expect(within(dialog).getByRole("img")).toHaveAttribute(
+      "src",
+      expect.stringContaining("harbor-gc-history-terminal"),
+    );
+    await user.click(
+      within(dialog).getByRole("button", { name: "Close expanded image" }),
+    );
+    expect(
+      screen.getByRole("button", { name: "Inspect image", exact: true }),
+    ).toHaveFocus();
+  });
+
+  it("resets the Lab style, pacing, stage, and view together", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(screen.getByRole("radio", { name: "Sage" }));
+    await user.click(
+      screen.getByRole("button", { name: "Round", exact: true }),
+    );
+    fireEvent.change(screen.getByRole("slider", { name: "Step duration" }), {
+      target: { value: "6" },
+    });
+    await user.click(screen.getByRole("tab", { name: /05 Dispatch/ }));
+    expect(
+      screen.getByRole("heading", { name: "Dispatch" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("tabpanel", { name: /05 Dispatch/ }),
+    ).toHaveTextContent("Approved route and configured destination.");
+    await user.click(screen.getByRole("button", { name: "CSS", exact: true }));
+    await user.click(
+      screen.getByRole("button", { name: "Reset lab controls" }),
+    );
+    expect(screen.getByRole("radio", { name: "Coral" })).toBeChecked();
+    expect(screen.getByRole("slider", { name: "Corner radius" })).toHaveValue(
+      "20",
+    );
+    expect(screen.getByRole("slider", { name: "Step duration" })).toHaveValue(
+      "3",
+    );
+    expect(screen.getByRole("tab", { name: /01 Intake/ })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(
+      screen.getByRole("button", { name: "Preview", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("button", { name: "Run walkthrough" }),
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("keeps workflow selection and generated CSS aligned with lab controls", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    const intake = screen.getByRole("tab", { name: /01 Intake/ });
+    intake.focus();
+    await user.keyboard("{End}");
+    expect(screen.getByRole("tab", { name: /05 Dispatch/ })).toHaveFocus();
+    expect(
+      screen.getByRole("heading", { name: "Dispatch" }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("radio", { name: "Sage" }));
+    const slider = screen.getByRole("slider", { name: "Corner radius" });
+    fireEvent.change(slider, { target: { value: "4" } });
+    await user.click(screen.getByRole("button", { name: "CSS", exact: true }));
+    const spy = vi.spyOn(navigator.clipboard, "writeText");
+    await user.click(screen.getByRole("button", { name: "Copy workflow CSS" }));
+    expect(spy).toHaveBeenCalledWith(
+      expect.stringContaining("--lab-accent: #b7cb8b"),
+    );
+    expect(spy).toHaveBeenCalledWith(
+      expect.stringContaining(`--lab-radius: ${slider.value}px`),
+    );
+    expect(await screen.findByText("CSS copied.")).toBeInTheDocument();
+  });
+
+  it("provides a manual copy fallback for the lab CSS", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    await user.click(screen.getByRole("button", { name: "CSS", exact: true }));
+    vi.spyOn(navigator.clipboard, "writeText").mockRejectedValueOnce(
+      new Error("denied"),
+    );
+    await user.click(screen.getByRole("button", { name: "Copy workflow CSS" }));
+    expect(
+      await screen.findByText(
+        "Copy unavailable. Select the CSS to copy it manually.",
+      ),
+    ).toBeInTheDocument();
+    expect(document.querySelector(".lab-code code")).toHaveTextContent(
+      "--lab-accent: #f16b50",
+    );
+  });
+
+  it("renders the rebuilt homepage and current project", async () => {
+    renderAt("/");
+    expect(
+      await screen.findByRole("heading", { level: 1, name: /Govind Charpe/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Selected projects" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /AI Agent Execution/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("My current project. OpenTrack is on hold."),
+    ).toBeInTheDocument();
+  });
+
+  it("finds projects by technology and recovers from combined empty filters", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    const search = screen.getByRole("searchbox", { name: "Search projects" });
+    await user.type(search, "n8n");
+    expect(
+      screen.getByRole("button", { name: "Explore LeadFlow" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.queryByRole("button", { name: "Explore GitAnalyzer" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText("1 project found")).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "Products", exact: true }),
+    );
+    expect(
+      screen.getByText("No project matches that combination."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Inspect screenshot" }),
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Show all projects" }));
+    expect(search).toHaveValue("");
+    expect(screen.getByText("2 projects found")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Explore GitAnalyzer" }),
+    ).toBeInTheDocument();
+  });
+
+  it("controls screenshot inspection with keyboard and resets it on image changes", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    const toggle = screen.getByRole("button", { name: "Inspect screenshot" });
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("group", { name: "Screenshot inspection area" }),
+    ).toHaveFocus();
+    await user.keyboard("{ArrowRight}{Escape}");
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
+    expect(toggle).toHaveFocus();
+    await user.click(toggle);
+    await user.click(
+      screen.getByRole("button", { name: "Scoring", exact: true }),
+    );
+    expect(
+      screen.getByRole("button", { name: "Inspect screenshot" }),
+    ).toHaveAttribute("aria-pressed", "false");
+    expect(document.querySelector(".screenshot-lens")).not.toBeInTheDocument();
   });
 
   it("renders direct case-study, open-source, resume, and 404 routes", async () => {
@@ -87,7 +468,7 @@ describe("portfolio routes and interactions", () => {
 
     view = renderAt("/resume");
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Govind Charpe" }),
+      await screen.findByRole("heading", { level: 1, name: /Govind\s*Charpe/ }),
     ).toBeInTheDocument();
     view.unmount();
 
@@ -135,23 +516,6 @@ describe("portfolio routes and interactions", () => {
     expect(localStorage.getItem("gc-theme")).toBe("light");
   });
 
-  it("updates GitAnalyzer detail controls without hiding essential copy", async () => {
-    const user = userEvent.setup();
-    renderAt("/");
-    await screen.findByRole("heading", { level: 1 });
-
-    const detailButton = screen.getByRole("tab", {
-      name: /^03\s*Repository-specific recommendations$/,
-    });
-    await user.click(detailButton);
-    expect(detailButton).toHaveAttribute("aria-selected", "true");
-    expect(
-      await screen.findByText(
-        "Generic advice is weaker than feedback tied to patterns in the repository being analyzed.",
-      ),
-    ).toBeInTheDocument();
-  });
-
   it("supports arrow-key navigation in case-study walkthrough tabs", async () => {
     const user = userEvent.setup();
     renderAt("/work/gitanalyzer");
@@ -174,62 +538,73 @@ describe("portfolio routes and interactions", () => {
     expect(firstTab).toHaveAttribute("aria-selected", "true");
   });
 
-  it("selects proof, pipeline, and skill evidence with explicit controls", async () => {
+  it("switches projects, resets screenshots, and wraps navigation", async () => {
     const user = userEvent.setup();
     renderAt("/");
     await screen.findByRole("heading", { level: 1 });
-
-    const proof = screen.getByRole("button", {
-      name: "Select Harbor CLI proof",
-    });
-    await user.click(proof);
-    expect(proof).toHaveAttribute("aria-pressed", "true");
-    expect(
-      screen.getAllByText("Garbage-collection history command").length,
-    ).toBeGreaterThanOrEqual(1);
-
-    const dispatch = screen.getByRole("tab", { name: /^05\s*Dispatch$/ });
-    await user.click(dispatch);
-    expect(dispatch).toHaveAttribute("aria-selected", "true");
-    expect(
-      await screen.findByText(
-        "An auditable dispatch plan for the selected destination.",
-      ),
-    ).toBeInTheDocument();
-
-    const goSkill = screen.getByRole("button", { name: "Go" });
-    await user.click(goSkill);
-    expect(goSkill).toHaveAttribute("aria-pressed", "true");
-    expect(
-      await screen.findByText("Growing through reviewed open source"),
-    ).toBeInTheDocument();
-
-    const ciSkill = screen.getByRole("button", {
-      name: "CI/CD fundamentals",
-    });
-    await user.click(ciSkill);
-    expect(ciSkill).toHaveAttribute("aria-pressed", "true");
-    const ciHeading = await screen.findByRole(
-      "heading",
-      {
-        level: 3,
-        name: /CI\/CD\s*fundamentals/,
-      },
-      { timeout: 5000 },
+    await user.click(screen.getByRole("button", { name: "Scoring" }));
+    expect(screen.getByRole("button", { name: "Scoring" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
     );
-    expect(ciHeading.querySelector(".skill-heading-line")).toHaveTextContent(
-      "fundamentals",
+    await user.click(screen.getByRole("button", { name: "Next project" }));
+    expect(
+      screen.getByRole("heading", { level: 3, name: "LeadFlow" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Qualification" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await user.click(screen.getByRole("button", { name: "Next project" }));
+    expect(
+      screen.getByRole("heading", { level: 3, name: "GitAnalyzer" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Overview" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
     );
+    await user.click(screen.getByRole("button", { name: "Previous project" }));
+    expect(
+      screen.getByRole("heading", { level: 3, name: "LeadFlow" }),
+    ).toBeInTheDocument();
   });
 
-  it("keeps contribution previews focused on status and evidence", async () => {
+  it("opens a real project and explores skill categories", async () => {
+    const user = userEvent.setup();
     renderAt("/");
     await screen.findByRole("heading", { level: 1 });
+    expect(
+      screen.getByRole("link", { name: "View GitAnalyzer case study" }),
+    ).toHaveAttribute("href", "/work/gitanalyzer");
+    await user.click(screen.getByRole("button", { name: "Backend and Data" }));
+    await user.click(
+      await screen.findByRole("button", { name: "OAuth" }, { timeout: 2500 }),
+    );
+    expect(
+      await screen.findByRole("heading", { level: 3, name: "OAuth" }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Languages" }));
+    expect(
+      await screen.findByRole("heading", { level: 3, name: "JavaScript" }),
+    ).toBeInTheDocument();
+  });
 
-    expect(screen.queryByText("Feature")).not.toBeInTheDocument();
-    expect(screen.queryByText("Improvement")).not.toBeInTheDocument();
-    expect(screen.getByText("Merged")).toBeInTheDocument();
-    expect(screen.getByText("Approved · Awaiting merge")).toBeInTheDocument();
+  it("expands a contribution without leaving the page", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    const summary = screen
+      .getByText("Safer login flag handling")
+      .closest("summary");
+    await user.click(summary);
+    expect(summary.parentElement).toHaveAttribute("open");
+    expect(
+      within(summary.parentElement).getByRole("link", {
+        name: /View pull request/,
+      }),
+    ).toHaveAttribute(
+      "href",
+      "https://github.com/goharbor/harbor-cli/pull/849",
+    );
   });
 
   it("stores organization and status filters in the URL", async () => {
@@ -271,7 +646,7 @@ describe("portfolio routes and interactions", () => {
     renderAt("/");
     await screen.findByRole("heading", { level: 1 });
 
-    const trigger = screen.getByRole("button", { name: "Expand evidence" });
+    const trigger = screen.getByRole("button", { name: "Expand screenshot" });
     await user.click(trigger);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("open");
@@ -295,6 +670,19 @@ describe("portfolio routes and interactions", () => {
     );
     expect(dialog).not.toHaveAttribute("open");
     expect(trigger).toHaveFocus();
+  });
+
+  it("reports clipboard failure with a usable email fallback", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    vi.spyOn(navigator.clipboard, "writeText").mockRejectedValueOnce(
+      new Error("denied"),
+    );
+    await user.click(screen.getByRole("button", { name: "Copy email" }));
+    expect(
+      await screen.findByRole("status", { name: "Email copy result" }),
+    ).toHaveTextContent("Copy unavailable. Email: govind.charpe16@gmail.com");
   });
 
   it("shows a static poster instead of video for reduced motion", async () => {
