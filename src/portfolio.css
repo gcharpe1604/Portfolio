@@ -2423,11 +2423,12 @@
 }
 @media (max-width: 600px) {
   .pf-section {
-    padding-block: 64px;
+    --section-space: 48px;
+    padding-block: var(--section-space);
   }
   .pf-section-head {
     display: block;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
   }
   .pf-section-head h2 {
     font-size: 42px;
@@ -2620,7 +2621,7 @@
   }
   .lab-track {
     gap: 4px;
-    padding-block: 28px;
+    padding-block: 24px;
   }
   .lab-track button > span {
     width: 36px;
@@ -2631,10 +2632,10 @@
     font-size: 7px;
   }
   .lab-track-line {
-    top: 46px;
+    top: 42px;
   }
   .lab-stage-detail {
-    padding: 20px;
+    padding: 16px;
     grid-template-columns: 1fr;
     gap: 22px;
     min-height: 310px;
@@ -2646,7 +2647,7 @@
     font-size: 11px;
   }
   .lab-boundary {
-    padding: 18px 0 0;
+    padding: 14px 0 0;
     border-left: 0;
     border-top: 1px solid #485a36;
   }
@@ -4237,7 +4238,16 @@ body.command-is-open {
   font-size: 9px;
 }
 .lab-canvas {
+  display: grid;
   min-height: 490px;
+}
+.lab-canvas > :is(.lab-preview, .lab-code) {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+.lab-canvas > [aria-hidden="true"] {
+  visibility: hidden;
+  pointer-events: none;
 }
 .lab-canvas-heading {
   align-items: center;
@@ -4406,7 +4416,15 @@ body.command-is-open {
     padding-inline: 8px;
   }
   .lab-controls {
-    gap: 20px;
+    gap: 16px;
+  }
+  .lab-controls :is(.lab-motion, .lab-reset, .lab-shape-presets button),
+  .lab-toolbar button,
+  .lab-walkthrough {
+    min-height: 44px;
+  }
+  .lab-range input {
+    min-height: 24px;
   }
   .lab-walkthrough {
     font-size: 8px;
@@ -4416,18 +4434,16 @@ body.command-is-open {
   .lab-stage-content {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
   .lab-io {
-    grid-template-columns: 1fr;
-    padding: 15px;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    padding: 12px;
     gap: 12px;
   }
-  .lab-io > svg {
-    transform: rotate(90deg);
-  }
   .lab-stage-detail {
-    min-height: 520px;
+    --lab-detail-height: 420px;
+    min-height: var(--lab-detail-height);
   }
   .lab-code pre {
     height: 420px;
@@ -4435,7 +4451,7 @@ body.command-is-open {
 }
 @media (max-width: 360px) {
   .lab-stage-detail {
-    min-height: 580px;
+    --lab-detail-height: 460px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -4651,20 +4667,20 @@ body.command-is-open {
   .pf-about-grid {
     display: flex;
     flex-direction: column;
-    gap: 35px;
+    gap: 28px;
   }
   .about-identity {
     position: relative;
     top: auto;
   }
   .identity-rotor {
-    height: 420px;
+    height: 392px;
   }
   .identity-face {
     padding: 24px;
   }
   .identity-message-window {
-    margin-top: 105px;
+    margin-top: 88px;
   }
   .identity-location {
     left: 24px;
@@ -4675,7 +4691,8 @@ body.command-is-open {
   }
   .notebook-page-window,
   .notebook-panel {
-    min-height: 420px;
+    --notebook-page-height: 320px;
+    min-height: var(--notebook-page-height);
   }
 }
 @media (prefers-reduced-motion: reduce) {

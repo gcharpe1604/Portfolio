@@ -83,13 +83,14 @@ export function MediaDialog({ asset, label = "Expand image", caption }) {
           </div>
           <div
             id={canvasId}
+            role="group"
             className={`media-dialog-canvas${zoomed ? " is-zoomed" : ""}`}
             style={{ "--dialog-image-width": `${asset.width / 16}rem` }}
             tabIndex={zoomed ? 0 : -1}
             aria-label={
               zoomed
                 ? "Zoomed evidence image. Scroll horizontally and vertically to inspect details."
-                : undefined
+                : "Evidence image"
             }
           >
             <ResponsiveImage

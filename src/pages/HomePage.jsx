@@ -159,7 +159,10 @@ export default function HomePage() {
                     </summary>
                     <div className="pf-pr-detail">
                       <p>{c.description}</p>
-                      <ExternalLink href={c.link}>
+                      <ExternalLink
+                        href={c.link}
+                        label={`View ${c.organization === "harbor" ? "Harbor CLI" : "Music Blocks"} pull request #${number} on GitHub`}
+                      >
                         View pull request
                       </ExternalLink>
                     </div>

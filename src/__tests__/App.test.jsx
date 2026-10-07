@@ -599,12 +599,61 @@ describe("portfolio routes and interactions", () => {
     expect(summary.parentElement).toHaveAttribute("open");
     expect(
       within(summary.parentElement).getByRole("link", {
-        name: /View pull request/,
+        name: "View Harbor CLI pull request #849 on GitHub",
       }),
     ).toHaveAttribute(
       "href",
       "https://github.com/goharbor/harbor-cli/pull/849",
     );
+  });
+
+  it("names each homepage pull-request link with its repository and number", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    for (const [repository, number, path] of [
+      ["Harbor CLI", 849, "goharbor/harbor-cli"],
+      ["Harbor CLI", 855, "goharbor/harbor-cli"],
+      ["Music Blocks", 6602, "sugarlabs/musicblocks"],
+      ["Music Blocks", 6316, "sugarlabs/musicblocks"],
+    ]) {
+      const summary = screen
+        .getByText(`${repository} / #${number}`)
+        .closest("summary");
+      await user.click(summary);
+      const link = within(summary.parentElement).getByRole("link", {
+        name: `View ${repository} pull request #${number} on GitHub`,
+      });
+      expect(link).toHaveAttribute(
+        "href",
+        `https://github.com/${path}/pull/${number}`,
+      );
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noreferrer");
+    }
+  });
+
+  it("keeps inactive Lab controls out of keyboard and accessibility navigation", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await screen.findByRole("heading", { level: 1 });
+    expect(
+      screen.queryByRole("button", { name: "Copy workflow CSS" }),
+    ).not.toBeInTheDocument();
+    expect(document.querySelector(".lab-code")).toHaveAttribute("inert");
+    await user.click(screen.getByRole("button", { name: "CSS", exact: true }));
+    expect(
+      screen.getByRole("button", { name: "Copy workflow CSS" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("tab", { name: "01 Intake" }),
+    ).not.toBeInTheDocument();
+    expect(document.querySelector(".lab-preview")).toHaveAttribute("inert");
+    await user.click(
+      screen.getByRole("button", { name: "Preview", exact: true }),
+    );
+    expect(screen.getByRole("tab", { name: "01 Intake" })).toBeInTheDocument();
+    expect(document.querySelector(".lab-preview")).not.toHaveAttribute("inert");
   });
 
   it("stores organization and status filters in the URL", async () => {
@@ -650,6 +699,12 @@ describe("portfolio routes and interactions", () => {
     await user.click(trigger);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toHaveAttribute("open");
+    expect(
+      within(dialog).getByRole("group", {
+        name: "Evidence image",
+        exact: true,
+      }),
+    ).toBeInTheDocument();
 
     const zoom = within(dialog).getByRole("button", {
       name: "Zoom evidence image for detail",

@@ -252,26 +252,32 @@ export function InterfaceLab() {
               </p>
             </div>
             <div className="lab-canvas">
-              {showCode && (
-                <div className="lab-code">
-                  <div>
-                    <span>workflow.css</span>
-                    <button onClick={copy} aria-label="Copy workflow CSS">
-                      {message === "CSS copied." ? (
-                        <Check size={16} />
-                      ) : (
-                        <Copy size={16} />
-                      )}{" "}
-                      Copy CSS
-                    </button>
-                  </div>
-                  <pre>
-                    <code>{code}</code>
-                  </pre>
-                  <p role="status">{message}</p>
+              <div
+                className="lab-code"
+                aria-hidden={!showCode}
+                inert={!showCode ? "" : undefined}
+              >
+                <div>
+                  <span>workflow.css</span>
+                  <button onClick={copy} aria-label="Copy workflow CSS">
+                    {message === "CSS copied." ? (
+                      <Check size={16} />
+                    ) : (
+                      <Copy size={16} />
+                    )}{" "}
+                    Copy CSS
+                  </button>
                 </div>
-              )}
-              <div className="lab-preview" hidden={showCode}>
+                <pre>
+                  <code>{code}</code>
+                </pre>
+                <p role="status">{message}</p>
+              </div>
+              <div
+                className="lab-preview"
+                aria-hidden={showCode}
+                inert={showCode ? "" : undefined}
+              >
                 <div className="lab-canvas-heading">
                   <span>FROM INPUT TO INTENT</span>
                   <button
