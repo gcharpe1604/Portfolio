@@ -1,10 +1,13 @@
 import { m, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useBrowserLayoutEffect } from "../hooks/useBrowserLayoutEffect";
+import { useNavbarContrast } from "../hooks/useNavbarContrast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { links, site } from "../data/site";
 import { ExternalLink } from "./ExternalLink";
 import { QuickNavigation } from "./QuickNavigation";
+import { NavbarGlass } from "./NavbarGlass";
+import "./NavbarGlass.css";
 import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
 
 const navigation = [
@@ -16,7 +19,12 @@ const navigation = [
   { id: "contact", label: "Contact", to: "/#contact" },
 ];
 
-function NavigationLinks({ activeId, mobile = false, reducedMotion }) {
+function NavigationLinks({
+  activeId,
+  mobile = false,
+  reducedMotion,
+  glassActive = false,
+}) {
   const navRef = useRef(null);
   const linkRefs = useRef({});
   const [indicator, setIndicator] = useState(null);
@@ -26,7 +34,10 @@ function NavigationLinks({ activeId, mobile = false, reducedMotion }) {
 
   useBrowserLayoutEffect(() => {
     const nav = navRef.current;
-    const link = linkRefs.current[activeId];
+    // Keep the first desktop lens mounted and decoded while the hero is active.
+    // Revealing it later must not start a separate flat-to-glass fade.
+    const link =
+      linkRefs.current[activeId] || (!mobile && linkRefs.current.work);
     let mounted = true;
     const measure = () => {
       if (!mounted) return;
@@ -57,7 +68,7 @@ function NavigationLinks({ activeId, mobile = false, reducedMotion }) {
       observer?.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [activeId]);
+  }, [activeId, mobile]);
 
   return (
     <nav
@@ -69,14 +80,24 @@ function NavigationLinks({ activeId, mobile = false, reducedMotion }) {
         <m.div
           className="pf-nav-indicator"
           aria-hidden="true"
+          data-visible={!!activeId}
           initial={false}
+          style={{ opacity: activeId ? 1 : 0 }}
           animate={indicator}
           transition={
             reducedMotion
               ? { duration: 0 }
               : { type: "spring", stiffness: 350, damping: 32 }
           }
-        />
+        >
+          {!mobile && (
+            <NavbarGlass
+              active={glassActive || !activeId}
+              control
+              lensSize={indicator}
+            />
+          )}
+        </m.div>
       )}
       {items.map((item) => (
         <Link
@@ -95,7 +116,7 @@ function NavigationLinks({ activeId, mobile = false, reducedMotion }) {
   );
 }
 
-function ThemeToggle() {
+function ThemeToggle({ glassActive }) {
   const [theme, setTheme] = useState("light");
   useEffect(() => {
     setTheme(document.documentElement.dataset.theme || "light");
@@ -120,6 +141,7 @@ function ThemeToggle() {
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
       title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
     >
+      <NavbarGlass active={glassActive} control />
       {theme === "dark" ? (
         <Sun size={18} aria-hidden="true" />
       ) : (
@@ -133,12 +155,14 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
+  const headerInnerRef = useRef(null);
   const menuButtonRef = useRef(null);
   const sheetRef = useRef(null);
   const progressRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
+  useNavbarContrast(headerInnerRef, location.pathname, scrolled);
 
   const returnHome = (event) => {
     if (
@@ -289,7 +313,8 @@ export function Header() {
         className="site-scroll-progress"
         aria-hidden="true"
       />
-      <div className="pf-header-inner">
+      <div className="pf-header-inner" ref={headerInnerRef}>
+        <NavbarGlass active={scrolled} />
         <Link
           className="pf-brand"
           to="/"
@@ -297,16 +322,25 @@ export function Header() {
           onClick={returnHome}
         >
           <span className="pf-brand-mark" aria-hidden="true">
-            gc<span>.</span>
+            <span className="pf-glass-foreground">
+              gc<span>.</span>
+            </span>
           </span>
           <span className="pf-brand-name">{site.name}</span>
         </Link>
 
-        <NavigationLinks activeId={activeNavId} reducedMotion={reduceMotion} />
+        <NavigationLinks
+          activeId={activeNavId}
+          reducedMotion={reduceMotion}
+          glassActive={scrolled}
+        />
 
         <div className="pf-header-actions">
           <Link className="pf-header-resume" to={links.resume}>
-            Résumé <ArrowUpRight size={15} aria-hidden="true" />
+            <NavbarGlass active={scrolled} control />
+            <span className="pf-glass-foreground">
+              Résumé <ArrowUpRight size={15} aria-hidden="true" />
+            </span>
           </Link>
           <ExternalLink
             className="icon-link"
@@ -316,8 +350,8 @@ export function Header() {
           >
             GitHub
           </ExternalLink>
-          <ThemeToggle />
-          <QuickNavigation />
+          <ThemeToggle glassActive={scrolled} />
+          <QuickNavigation glassActive={scrolled} />
           <button
             ref={menuButtonRef}
             className="icon-button mobile-menu-button"
@@ -327,6 +361,7 @@ export function Header() {
             aria-controls="mobile-menu"
             onClick={() => setMenuOpen(true)}
           >
+            <NavbarGlass active={scrolled} control />
             <Menu size={21} aria-hidden="true" />
           </button>
         </div>

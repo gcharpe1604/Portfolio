@@ -1,6 +1,7 @@
 import { ArrowUpRight, Search, X } from "lucide-react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { NavbarGlass } from "./NavbarGlass";
 
 const destinations = [
   {
@@ -59,7 +60,7 @@ const destinations = [
   },
 ];
 
-export function QuickNavigation() {
+export function QuickNavigation({ glassActive = false }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(0);
   const dialog = useRef(null);
@@ -135,6 +136,7 @@ export function QuickNavigation() {
         title="Quick navigation · Ctrl/⌘ K"
         onClick={open}
       >
+        <NavbarGlass active={glassActive} control />
         <Search size={17} aria-hidden="true" />
       </button>
       <dialog

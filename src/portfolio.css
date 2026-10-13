@@ -29,13 +29,14 @@
   flex-shrink: 0;
 }
 .pf-site-header {
+  --navbar-ease: cubic-bezier(0.4, 0, 0.2, 1);
   height: var(--header-height);
   position: sticky;
   top: 0;
   z-index: 80;
   padding-inline: var(--page-gutter);
   background: var(--paper);
-  transition: background-color 0.5s var(--ease-out);
+  transition: background-color 0.64s var(--navbar-ease);
 }
 .pf-header-inner {
   max-width: var(--content-width);
@@ -47,20 +48,18 @@
   justify-content: space-between;
   gap: 20px;
   transition:
-    width 0.64s var(--ease-out),
-    height 0.64s var(--ease-out),
-    padding 0.64s var(--ease-out),
-    border-radius 0.64s var(--ease-out),
-    transform 0.64s var(--ease-out),
-    background-color 0.5s var(--ease-out),
-    border-color 0.5s var(--ease-out),
-    box-shadow 0.64s var(--ease-out);
+    width 0.64s var(--navbar-ease),
+    height 0.64s var(--navbar-ease),
+    padding 0.64s var(--navbar-ease),
+    border-radius 0.64s var(--navbar-ease),
+    transform 0.64s var(--navbar-ease),
+    background-color 0.64s var(--navbar-ease),
+    border-color 0.64s var(--navbar-ease),
+    box-shadow 0.64s var(--navbar-ease);
   border: 1px solid transparent;
   border-radius: 0;
   background: color-mix(in srgb, var(--paper-raised) 0%, transparent);
   transform: translateY(0);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
 }
 .pf-site-header.is-scrolled {
   background: transparent;
@@ -72,10 +71,10 @@
   width: calc(100% - clamp(12px, 4vw, 64px));
   height: 64px;
   transform: translateY(12px);
-  background: color-mix(in srgb, var(--paper-raised) 92%, transparent);
+  background: transparent;
   padding-inline: 22px;
   border-radius: 100px;
-  box-shadow: 0 8px 28px #0000000b;
+  box-shadow: none;
 }
 @media (prefers-reduced-motion: reduce) {
   .pf-site-header,

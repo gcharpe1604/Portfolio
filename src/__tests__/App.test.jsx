@@ -56,7 +56,14 @@ describe("portfolio routes and interactions", () => {
           name: "Govind Charpe, home",
         }),
       );
-      await screen.findByRole("heading", { level: 1 });
+      await screen.findByRole(
+        "heading",
+        {
+          level: 1,
+          name: "Govind Charpe — Software that invites a closer look.",
+        },
+        { timeout: 5000 },
+      );
       await waitFor(() =>
         expect(document.querySelector('link[rel="canonical"]').href).toBe(
           "https://govind-charpe.netlify.app/",
